@@ -54,6 +54,14 @@ public class Manager extends Staff {
             this.officeNumber = officeNumber;
             return this;
         }
+        public Builder copy(Manager manager) {
+            this.staffId = manager.getStaffId();
+            this.name = manager.getName();
+            this.contactDetails = manager.getContactDetails();
+            this.officeNumber = manager.getOfficeNumber();
+            return this;
+        }
+
 
         public Manager build() {
             return new Manager(this);

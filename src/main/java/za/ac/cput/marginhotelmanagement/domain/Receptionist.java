@@ -55,6 +55,14 @@ public class Receptionist extends Staff {
             return this;
         }
 
+        public Builder copy(Receptionist receptionist) {
+            this.staffId = receptionist.staffId;
+            this.name = receptionist.name;
+            this.contactDetails = receptionist.contactDetails;
+            this.deskNumber = receptionist.deskNumber;
+            return this;
+        }
+
         public Receptionist build() {
             return new Receptionist(this);
         }
