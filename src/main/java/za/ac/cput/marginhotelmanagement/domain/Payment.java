@@ -1,8 +1,8 @@
 package za.ac.cput.marginhotelmanagement.domain;
-/* Payment.java
-   Payment POJO class
+/*
    Author: DM Madondo (230949703)
-   Date: 20 June 2026 */
+   Date: 20 June 2026
+   */
 
 import za.ac.cput.marginhotelmanagement.enums.PaymentStatus;
 
@@ -13,8 +13,9 @@ public class Payment {
     private double amount;
     private PaymentStatus paymentStatus;
     private LocalDateTime paymentDate;
+    private Invoice invoice;
 
-    private Payment() {
+    protected Payment() {
     }
 
     public Payment(Builder builder) {
@@ -22,6 +23,7 @@ public class Payment {
         this.amount = builder.amount;
         this.paymentStatus = builder.paymentStatus;
         this.paymentDate = builder.paymentDate;
+        this.invoice = builder.invoice;
     }
 
     public Long getPaymentId() {
@@ -40,10 +42,13 @@ public class Payment {
         return paymentDate;
     }
 
+    public Invoice getInvoice(){return invoice;}
+
     @Override
     public String toString() {
         return "Payment{" +
                 "paymentId=" + paymentId +
+                ", invoiceId=" + invoice.getInvoice() +
                 ", amount=" + amount +
                 ", paymentStatus=" + paymentStatus +
                 ", paymentDate=" + paymentDate +
@@ -72,12 +77,17 @@ public class Payment {
             this.paymentDate = paymentDate;
             return this;
         }
+        public Builder setInvoice(Invoice invoice){
+            this.invoice = invoice;
+            return this;
+        }
 
         public Builder copy(Payment payment){
             this.paymentId = payment.paymentId;
             this.amount = payment.amount;
             this.paymentStatus = payment.paymentStatus;
             this.paymentDate = payment.paymentDate;
+            this.invoice = payment.invoice;
             return this;
         }
 
