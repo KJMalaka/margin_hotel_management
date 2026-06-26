@@ -64,7 +64,7 @@ public class Name implements ValueObject {
             return this;
         }
 
-        public Name Builder(){
+        public Name build(){
             return new Name(this);
         }
 
