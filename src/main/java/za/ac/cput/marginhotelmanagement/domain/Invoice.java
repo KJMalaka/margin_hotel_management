@@ -11,11 +11,12 @@ import java.time.LocalDate;
 public class Invoice {
 
     private Long invoiceId;
+    private String reference;
     private double totalAmount;
+    private InvoiceStatus status;
     private LocalDate issueDate;
-    private String bookingId;
-    private int guestId;
-    private InvoiceStatus invoiceStatus;
+    private Booking booking;
+
 
     public Invoice(){
 
@@ -23,16 +24,20 @@ public class Invoice {
 
     public Invoice (Builder builder){
         this.invoiceId = builder.invoiceId;
+        this.reference = builder.reference;
         this.totalAmount = builder.totalAmount;
         this.issueDate= builder.issueDate;
-        this.bookingId = builder.bookingId;
-        this.guestId = builder.guestId;
-        this.invoiceStatus = builder.invoiceStatus;
+        this.booking = builder.booking;
+        this.status = builder.status;
 
     }
 
     public Long getInvoiceId() {
         return invoiceId;
+    }
+
+    public String getReference() {
+        return reference;
     }
 
     public double getTotalAmount() {
@@ -43,40 +48,41 @@ public class Invoice {
         return issueDate;
     }
 
-    public String getBookingId(){
-        return bookingId;
+    public String getBooking(){
+        return booking;
     }
 
-    public int getGuestId(){
-        return guestId;
-    }
-
-    public InvoiceStatus getInvoiceStatus() {
-        return invoiceStatus;
+    public InvoiceStatus getStatus() {
+        return status;
     }
 
     @Override
     public String toString() {
         return "Invoice{" +
                 "invoiceId=" + invoiceId +
+                ", reference='" + reference + '\'' +
                 ", totalAmount=" + totalAmount +
+                ", status=" + status +
                 ", issueDate=" + issueDate +
-                ", bookingId='" + bookingId + '\'' +
-                ", guestId=" + guestId +
-                ", invoiceStatus=" + invoiceStatus +
+                ", booking=" + booking +
                 '}';
     }
 
     public static class Builder{
         private Long invoiceId;
+        private String reference;
         private double totalAmount;
         private LocalDate issueDate;
-        private String bookingId;
-        private int guestId;
-        private InvoiceStatus invoiceStatus;
+        private Booking booking;
+        private InvoiceStatus status;
 
         public Builder setInvoiceId(Long invoiceId) {
             this.invoiceId = invoiceId;
+            return this;
+        }
+
+        public Builder setReference(String reference){
+            this.reference = reference;
             return this;
         }
 
@@ -90,28 +96,23 @@ public class Invoice {
             return this;
         }
 
-        public Builder setBookingId(String book){
-            this.bookingId = bookingId;
+        public Builder setBooking( Booking booking){
+            this.booking = booking;
             return this;
         }
 
-        public Builder setGuestId(int guestId){
-            this.guestId = guestId;
-            return this;
-        }
-
-        public Builder setInvoiceStatus(InvoiceStatus invoiceStatus) {
-            this.invoiceStatus = invoiceStatus;
+        public Builder setStatus(InvoiceStatus status) {
+            this.status = status;
             return this;
         }
 
         public Builder copy (Invoice invoice){
             this.invoiceId = invoice.invoiceId;
+            this.reference = invoice.reference;
             this.totalAmount = invoice.totalAmount;
             this.issueDate = invoice.issueDate;
-            this.bookingId = invoice.bookingId;
-            this.guestId = invoice.guestId;
-            this.invoiceStatus = invoice.invoiceStatus;
+            this.booking = invoice.booking;
+            this.status = invoice.status;
             return this;
         }
 

@@ -33,7 +33,7 @@ public class Helper {
         return stayPeriod.getCheckInDate().isAfter(stayPeriod.getCheckOutDate());
     }
 
-    // Payment amount validation: must be > 0
+    // Amount validation: must be > 0 (Invoice & Payment)
     public static boolean isValidAmount(double amount) {
         return amount > 0;
     }
