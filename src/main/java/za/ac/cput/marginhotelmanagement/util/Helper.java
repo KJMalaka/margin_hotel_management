@@ -31,5 +31,13 @@ public class Helper {
     public static boolean isNullOrEmpty(Object obj) {
         return obj == null;
     }
+    // Returns true if the email is null, empty, or missing '@' and '.'
+    public static boolean isInvalidEmail(String email) {
+        return isNullOrEmpty(email) || !email.contains("@") || !email.contains(".");
+    }
+    // Returns true if the mobile number is null, empty, or not exactly 10 digits
+    public static boolean isInvalidMobile(String mobile) {
+        return isNullOrEmpty(mobile) || !mobile.matches("\\d{10}");
+    }
 
 }
