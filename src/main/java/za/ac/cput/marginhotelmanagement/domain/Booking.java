@@ -65,7 +65,7 @@ public class Booking {
                 '}';
     }
 
-    private static class Builder{
+    public static class Builder{
         private Long bookingId;
         private LocalDate bookingDate;
         private StayPeriod stayPeriod;
@@ -98,6 +98,11 @@ public class Booking {
             this.guest = guest;
             return this;
         }
+        public Builder setRoom(Room room) {
+            this.room = room;
+            return this;
+        }
+
         public Builder copy(Booking booking){
             this.bookingId = booking.bookingId;
             this.bookingDate = booking.bookingDate;
