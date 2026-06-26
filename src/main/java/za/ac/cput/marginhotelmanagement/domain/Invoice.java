@@ -17,7 +17,7 @@ public class Invoice {
     private int guestId;
     private InvoiceStatus invoiceStatus;
 
-    protected Invoice(){
+    public Invoice(){
 
     }
 

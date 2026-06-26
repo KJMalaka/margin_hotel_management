@@ -15,7 +15,7 @@ public class Payment {
     private LocalDateTime paymentDate;
     private Invoice invoice;
 
-    protected Payment() {
+    public Payment() {
     }
 
     public Payment(Builder builder) {

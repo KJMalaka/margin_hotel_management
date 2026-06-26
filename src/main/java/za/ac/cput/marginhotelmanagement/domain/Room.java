@@ -12,7 +12,7 @@ public class Room {
     private final RoomStatus roomStatus;
 
 
-    protected Room() {
+    public Room() {
         this.roomId = "";
         this.roomNumber = 0;
         this.roomType = null;

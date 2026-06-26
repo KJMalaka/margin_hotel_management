@@ -11,7 +11,7 @@ public class Guest {
     private Name name;
     private ContactDetails contactDetails;
 
-    private Guest() {}
+    public Guest() {}
 
     public Guest(Builder builder) {
         this.guestId = builder.guestId;
