@@ -33,7 +33,7 @@ public class StayPeriod implements ValueObject {
                 ", checkOutDate=" + checkOutDate +
                 '}';
     }
-    private static class Builder{
+    public static class Builder{
         private LocalDateTime checkInDate;
         private LocalDateTime checkOutDate;
 
