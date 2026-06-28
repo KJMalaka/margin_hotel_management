@@ -48,7 +48,7 @@ public class Invoice {
         return issueDate;
     }
 
-    public String getBooking(){
+    public Booking getBooking(){
         return booking;
     }
 
