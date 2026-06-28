@@ -20,7 +20,6 @@ public class Room {
         this.roomStatus = null;
     }
 
-
     private Room(Builder builder) {
         this.roomId = builder.roomId;
         this.roomNumber = builder.roomNumber;
@@ -29,6 +28,10 @@ public class Room {
         this.roomStatus = builder.roomStatus;
     }
 
+
+    public Builder toBuilder() {
+        return new Builder().copy(this);
+    }
 
     public String getRoomId() {
         return roomId;
@@ -49,7 +52,6 @@ public class Room {
     public RoomStatus getRoomStatus() {
         return roomStatus;
     }
-
 
     public static class Builder {
         private String roomId;
@@ -83,6 +85,15 @@ public class Room {
             return this;
         }
 
+
+        public Builder copy(Room room) {
+            this.roomId = room.roomId;
+            this.roomNumber = room.roomNumber;
+            this.roomType = room.roomType;
+            this.pricePerNight = room.pricePerNight;
+            this.roomStatus = room.roomStatus;
+            return this;
+        }
 
         public Room build() {
             return new Room(this);
