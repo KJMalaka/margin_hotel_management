@@ -42,4 +42,29 @@ public class BookingFactory {
                 .setRoom(room)
                 .build();
     }
+
+    //Overloaded method without bookingId
+    public static Booking createBooking(LocalDate bookingDate, StayPeriod stayPeriod, BookingChannel bookingChannel, Guest guest, Room room) {
+        if (Helper.isNullOrEmpty(bookingDate) ||
+                Helper.isNullOrEmpty(stayPeriod) ||
+                Helper.isNullOrEmpty(bookingChannel) ||
+                Helper.isNullOrEmpty(guest) ||
+                Helper.isNullOrEmpty(room)) {
+            return null;
+        }
+        if (bookingDate.isAfter(LocalDate.now())) {
+            return null;
+        }
+        if (stayPeriod.getCheckInDate() == null || stayPeriod.getCheckOutDate() == null || stayPeriod.getCheckInDate().isAfter(stayPeriod.getCheckOutDate())) {
+            return null;
+        }
+
+        return new Booking.Builder()
+                .setBookingDate(bookingDate)
+                .setStayPeriod(stayPeriod)
+                .setBookingChannel(bookingChannel)
+                .setGuest(guest)
+                .setRoom(room)
+                .build();
+    }
 }

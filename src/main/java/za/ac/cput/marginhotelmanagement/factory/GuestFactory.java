@@ -26,4 +26,15 @@ public class GuestFactory {
                 .setContactDetails(contactDetails)
                 .build();
     }
+
+    //Overloaded method without guestId
+    public static Guest createGuest(Name name, ContactDetails contactDetails) {
+        if (Helper.isNullOrEmpty(name) || Helper.isNullOrEmpty(contactDetails)) {
+            return null;
+        }
+        return new Guest.Builder()
+                .setName(name)
+                .setContactDetails(contactDetails)
+                .build();
+    }
 }

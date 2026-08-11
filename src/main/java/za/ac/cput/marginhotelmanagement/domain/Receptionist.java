@@ -4,10 +4,14 @@ package za.ac.cput.marginhotelmanagement.domain;
    Author: Lithabile Lalela (221340963)
    Date: 21 June 2026 */
 
+import jakarta.persistence.*;
+
+@Entity
+@Table (name ="receptionist")
 public class Receptionist extends Staff {
     private String deskNumber;
 
-    private Receptionist() {
+    protected Receptionist() {
     }
 
     public Receptionist(Builder builder) {

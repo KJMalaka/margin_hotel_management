@@ -14,12 +14,11 @@ public class Guest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "name_id")
+
+    @Embedded
     private Name name;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "contact_details_id")
+    @Embedded
     private ContactDetails contactDetails;
 
     public Guest() {}

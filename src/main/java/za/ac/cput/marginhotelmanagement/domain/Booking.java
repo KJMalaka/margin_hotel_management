@@ -16,16 +16,21 @@ public class Booking {
     private Long bookingId;
     private LocalDate bookingDate;
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "checkInDate", column = @Column(name = "check_in_date")),
+            @AttributeOverride(name = "checkOutDate", column = @Column(name = "check_out_date"))
+    })
     private StayPeriod stayPeriod;
 
     private BookingChannel bookingChannel;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "guest_id")
     private Guest guest;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
+
+   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+   @JoinColumn(name = "room_id")
     private Room room;
 
     public Booking() {

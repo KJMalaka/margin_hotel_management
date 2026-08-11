@@ -4,15 +4,13 @@ package za.ac.cput.marginhotelmanagement.domain;
    Author: MS MALAPILE (222904267)
    Date: 20 June 2026 */
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;
 
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "invoice")
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +19,13 @@ public class Invoice {
     private double totalAmount;
     private InvoiceStatus status;
     private LocalDate issueDate;
+    @ManyToOne
+    @JoinColumn(name = "booking_booking_id")
     private Booking booking;
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
+    }
 
 
     public Invoice(){

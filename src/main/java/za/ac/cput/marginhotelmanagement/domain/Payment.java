@@ -49,7 +49,9 @@ public class Payment {
         return paymentDate;
     }
 
-    public Invoice getInvoice(){return invoice;}
+    public Invoice getInvoice() {
+        return invoice;
+    }
 
     @Override
     public String toString() {
@@ -62,35 +64,39 @@ public class Payment {
                 '}';
     }
 
-    public static class Builder{
+    public static class Builder {
         private Long paymentId;
         private double amount;
         private PaymentStatus paymentStatus;
         private LocalDateTime paymentDate;
         private Invoice invoice;
 
-        public Builder setPaymentId(Long paymentId){
+        public Builder setPaymentId(Long paymentId) {
             this.paymentId = paymentId;
             return this;
         }
-        public Builder setAmount(double amount){
+
+        public Builder setAmount(double amount) {
             this.amount = amount;
             return this;
         }
-        public Builder setPaymentStatus(PaymentStatus paymentStatus){
+
+        public Builder setPaymentStatus(PaymentStatus paymentStatus) {
             this.paymentStatus = paymentStatus;
             return this;
         }
-        public Builder setPaymentDate(LocalDateTime paymentDate){
+
+        public Builder setPaymentDate(LocalDateTime paymentDate) {
             this.paymentDate = paymentDate;
             return this;
         }
-        public Builder setInvoice(Invoice invoice){
+
+        public Builder setInvoice(Invoice invoice) {
             this.invoice = invoice;
             return this;
         }
 
-        public Builder copy(Payment payment){
+        public Builder copy(Payment payment) {
             this.paymentId = payment.paymentId;
             this.amount = payment.amount;
             this.paymentStatus = payment.paymentStatus;
@@ -99,7 +105,7 @@ public class Payment {
             return this;
         }
 
-        public Payment build(){
+        public Payment build() {
             return new Payment(this);
         }
     }

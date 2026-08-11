@@ -7,16 +7,15 @@ package za.ac.cput.marginhotelmanagement.domain;
 
 import jakarta.persistence.*;
 
-@Entity
+@Embeddable
 @Table(name = "names")
 public class Name implements ValueObject {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private String firstName;
     private String middleName;
     private String lastName;
 
-    private Name(){
+    protected Name(){
 
     }
 

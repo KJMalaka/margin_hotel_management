@@ -3,19 +3,26 @@ package za.ac.cput.marginhotelmanagement.domain;
    Author: Katlego Malaka(230443370)
    Date: 20 June 2026 */
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Embeddable;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+@Embeddable
 public class StayPeriod implements ValueObject {
 
     private LocalDateTime checkInDate;
     private LocalDateTime checkOutDate;
 
-   private StayPeriod(){
+   public StayPeriod(LocalDate localDate, LocalDate date){
 
    }
-    public StayPeriod(Builder builder) {
+    private StayPeriod(Builder builder) {
         this.checkInDate = builder.checkInDate;
         this.checkOutDate = builder.checkOutDate;
+    }
+
+    public StayPeriod() {
+
     }
 
     public LocalDateTime getCheckOutDate() {

@@ -4,10 +4,15 @@ package za.ac.cput.marginhotelmanagement.domain;
    Author: Lithabile Lalela (221340963)
    Date: 21 June 2026 */
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "manager")
 public class Manager extends Staff {
+
     private String officeNumber;
 
-    private Manager() {
+    protected Manager() {
     }
 
     public Manager(Builder builder) {
