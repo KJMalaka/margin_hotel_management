@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.marginhotelmanagement.domain.Booking;
 import za.ac.cput.marginhotelmanagement.repository.BookingRepository;
+import za.ac.cput.marginhotelmanagement.util.Helper;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -20,14 +22,17 @@ public class BookingService implements IBookingService {
     public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
     }
+
     @Override
-     public Booking create(Booking booking) {
+    public Booking create(Booking booking) {
         return bookingRepository.save(booking);
     }
+
     @Override
     public Booking read(Long id) {
         return bookingRepository.findById(id).orElse(null);
     }
+
     @Override
     public Booking update(Booking booking) {
         if (bookingRepository.existsById(booking.getBookingId())) {
@@ -54,10 +59,15 @@ public class BookingService implements IBookingService {
         }
         return false;
     }
+
     @Override
     public List<Booking> getAll() {
         return bookingRepository.findAll();
     }
+
+    @Override
+    public boolean isRoomAvailable(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
+        List<Booking> roomBookings = bookingRepository.findByRoomId(roomId);
+        return Helper.isRoomAvailable(roomBookings, checkInDate, checkOutDate);
+    }
 }
-
-
