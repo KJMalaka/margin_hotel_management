@@ -1,23 +1,30 @@
 package za.ac.cput.marginhotelmanagement.domain;
 
+import jakarta.persistence.*;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 
+@Entity
+
 public class Room {
 
-    private final String roomId;
-    private final int roomNumber;
-    private final RoomType roomType;
-    private final double pricePerNight;
-    private final RoomStatus roomStatus;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private  String roomId;
+
+    private int roomNumber;
+
+    @Enumerated(EnumType.STRING)
+    private  RoomType roomType;
+
+    private  double pricePerNight;
+
+    @Enumerated(EnumType.STRING)
+    private  RoomStatus roomStatus;
 
 
     public Room() {
-        this.roomId = "";
-        this.roomNumber = 0;
-        this.roomType = null;
-        this.pricePerNight = 0.0;
-        this.roomStatus = null;
+
     }
 
     private Room(Builder builder) {
