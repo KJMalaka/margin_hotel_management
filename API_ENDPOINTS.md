@@ -9,6 +9,7 @@ The application uses these controller base paths:
 - `/booking`
 - `/invoice`
 - `/payment`
+- `/guest`
 - `/staff`
 
 ## Booking API
@@ -38,6 +39,48 @@ Base path: `/booking`
 - `GET /booking/getall`
   - Returns all bookings.
   - Response: list of `Booking`
+
+## Guest API
+
+Base path: `/guest`
+
+- `POST /guest/create`
+  - Creates a guest.
+  - Request body: `Guest`
+  - Response: created `Guest`
+
+- `GET /guest/read/{id}`
+  - Reads one guest by ID.
+  - Path variable: `id`
+  - Response: `Guest` or 404 if not found
+
+- `PUT /guest/update`
+  - Updates a guest.
+  - Request body: `Guest`
+  - Response: updated `Guest` or 404 if not found
+
+- `DELETE /guest/delete/{id}`
+  - Deletes a guest by ID.
+  - Path variable: `id`
+  - Response: 204 No Content or 404 if not found
+
+- `GET /guest/getall`
+  - Returns all guests.
+  - Response: list of `Guest`
+
+- `GET /guest/findByFirstName/{firstName}`
+  - Finds guests by first name.
+  - Path variable: `firstName`
+
+- `GET /guest/findByLastName/{lastName}`
+  - Finds guests by last name.
+  - Path variable: `lastName`
+
+- `GET /guest/findByEmail/{email}`
+  - Finds a guest by email.
+  - Path variable: `email`
+  - Response: `Guest` or 404 if not found
+
 
 ## Invoice API
 
@@ -142,5 +185,5 @@ Base path: `/staff`
 - These are Spring Boot REST controllers.
 - Each controller is mapped with `@RequestMapping` on a resource path.
 - Most endpoints use standard CRUD-style actions plus a few query endpoints.
-- The main request/response objects are domain classes such as `Booking`, `Invoice`, `Payment`, `Manager`, and `Receptionist`.
+- The main request/response objects are domain classes such as `Booking`, `Invoice`, `Guest` , `Payment`, `Manager`, and `Receptionist`.
 - One endpoint path looks inconsistent: `/staff/requeptionist/read/{id}` should likely be `/staff/receptionist/read/{id}`.
