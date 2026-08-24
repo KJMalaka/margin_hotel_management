@@ -22,6 +22,7 @@ public class Booking {
     })
     private StayPeriod stayPeriod;
 
+    @Enumerated(EnumType.STRING)
     private BookingChannel bookingChannel;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

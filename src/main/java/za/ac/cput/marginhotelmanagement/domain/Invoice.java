@@ -17,6 +17,7 @@ public class Invoice {
     private Long invoiceId;
     private String reference;
     private double totalAmount;
+    @Enumerated(EnumType.STRING)
     private InvoiceStatus status;
     private LocalDate issueDate;
     @ManyToOne

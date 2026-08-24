@@ -1,8 +1,6 @@
 package za.ac.cput.marginhotelmanagement.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import java.util.Objects;
@@ -13,8 +11,10 @@ public class Room {
     @Id
     private String roomId;
     private int roomNumber;
+    @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private double pricePerNight;
+    @Enumerated(EnumType.STRING)
     private RoomStatus roomStatus;
 
 
