@@ -55,6 +55,37 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
         </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Flyway for database migrations -->
+    <dependency>
+        <artifactId>flyway-core</artifactId>
+        <groupId>org.flywaydb</groupId>
+    </dependency>
+    <dependency>
+        <artifactId>flyway-mysql</artifactId>
+        <groupId>org.flywaydb</groupId>
+    </dependency>
+        <!-- Thymeleaf for server-side rendering -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!-- MapStruct for object mapping -->
+        <dependency>
+            <artifactId>mapstruct-processor</artifactId>
+            <groupId>org.mapstruct</groupId>
+            <version>1.6.3</version>
+        </dependency>
+        <dependency>
+            <artifactId>mapstruct</artifactId>
+            <groupId>org.mapstruct</groupId>
+            <version>1.6.3</version>
+        </dependency>
     </dependencies>
 
     <build>

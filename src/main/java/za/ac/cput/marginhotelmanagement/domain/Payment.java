@@ -15,6 +15,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
     private double amount;
+    @Enumerated(EnumType.STRING) // store "SUCCESS"/"FAILED" in the DB, not 0/1
     private PaymentStatus paymentStatus;
     private LocalDateTime paymentDate;
 
@@ -31,6 +32,11 @@ public class Payment {
         this.paymentStatus = builder.paymentStatus;
         this.paymentDate = builder.paymentDate;
         this.invoice = builder.invoice;
+    }
+
+    //Static factory method to create a new Builder instance detectable by MapStruct builder detection
+    public static Builder builder() {
+        return new Builder();
     }
 
     public Long getPaymentId() {
