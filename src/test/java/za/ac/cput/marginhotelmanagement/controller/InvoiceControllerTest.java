@@ -6,37 +6,38 @@ package za.ac.cput.marginhotelmanagement.controller;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.http.ResponseEntity;
-import za.ac.cput.marginhotelmanagement.domain.Booking;
-import za.ac.cput.marginhotelmanagement.domain.Invoice;
-import za.ac.cput.marginhotelmanagement.enums.BookingChannel;
-import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;
-import za.ac.cput.marginhotelmanagement.factory.BookingFactory;
-import za.ac.cput.marginhotelmanagement.factory.InvoiceFactory;
-import za.ac.cput.marginhotelmanagement.repository.BookingRepository;
-import za.ac.cput.marginhotelmanagement.repository.InvoiceRepository;
+import za.ac.cput.marginhotelmanagement.domain.*;
+import za.ac.cput.marginhotelmanagement.enums.*;
+import za.ac.cput.marginhotelmanagement.factory.*;
+import za.ac.cput.marginhotelmanagement.repository.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InvoiceControllerTest {
 
     private static Booking mockBooking;
+
     @Autowired
     private BookingRepository bookingRepository;
+
     private static Invoice mockInvoice;
+
     @Autowired
     private InvoiceRepository invoiceRepository;
 
     @Autowired
     private TestRestTemplate restTemplate;
+
     private static final String BASE_URL = "http://localhost:8080/invoice";
 
     @BeforeEach

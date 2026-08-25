@@ -1,30 +1,24 @@
 package za.ac.cput.marginhotelmanagement.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
+import java.util.Objects;
 
 @Entity
+@Table(name = "rooms")
 public class Room {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private final String roomId;
-    private final int roomNumber;
-    private final RoomType roomType;
-    private final double pricePerNight;
-    private final RoomStatus roomStatus;
+    private String roomId;
+    private int roomNumber;
+    @Enumerated(EnumType.STRING)
+    private RoomType roomType;
+    private double pricePerNight;
+    @Enumerated(EnumType.STRING)
+    private RoomStatus roomStatus;
 
-    public Room() {
-        this.roomId = "";
-        this.roomNumber = 0;
-        this.roomType = null;
-        this.pricePerNight = 0.0;
-        this.roomStatus = null;
+
+    protected Room() {
     }
 
     private Room(Builder builder) {
@@ -33,18 +27,6 @@ public class Room {
         this.roomType = builder.roomType;
         this.pricePerNight = builder.pricePerNight;
         this.roomStatus = builder.roomStatus;
-    }
-
-    public Builder toBuilder() {
-        return new Builder().copy(this);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getRoomId() {
@@ -65,6 +47,30 @@ public class Room {
 
     public RoomStatus getRoomStatus() {
         return roomStatus;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room room = (Room) o;
+        return Objects.equals(roomId, room.roomId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roomId);
+    }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "roomId='" + roomId + '\'' +
+                ", roomNumber=" + roomNumber +
+                ", roomType=" + roomType +
+                ", pricePerNight=" + pricePerNight +
+                ", roomStatus=" + roomStatus +
+                '}';
     }
 
     public static class Builder {
@@ -100,11 +106,13 @@ public class Room {
         }
 
         public Builder copy(Room room) {
-            this.roomId = room.roomId;
-            this.roomNumber = room.roomNumber;
-            this.roomType = room.roomType;
-            this.pricePerNight = room.pricePerNight;
-            this.roomStatus = room.roomStatus;
+            if (room != null) {
+                this.roomId = room.roomId;
+                this.roomNumber = room.roomNumber;
+                this.roomType = room.roomType;
+                this.pricePerNight = room.pricePerNight;
+                this.roomStatus = room.roomStatus;
+            }
             return this;
         }
 

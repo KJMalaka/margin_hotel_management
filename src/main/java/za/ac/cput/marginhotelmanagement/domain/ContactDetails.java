@@ -1,17 +1,10 @@
 package za.ac.cput.marginhotelmanagement.domain;
-/* ContactDetails.java
-   ContactDetails value object
-   Author: Lithabile Lalela (221340963)
-   Date: 12 July 2026 */
 
-import jakarta.persistence.Embeddable;
-
-@Embeddable
 public class ContactDetails implements ValueObject {
     private String email;
     private String mobile;
 
-    public ContactDetails() {
+    private ContactDetails() {
     }
 
     public ContactDetails(Builder builder) {
@@ -22,7 +15,6 @@ public class ContactDetails implements ValueObject {
     public String getEmail() {
         return email;
     }
-
     public String getMobile() {
         return mobile;
     }
@@ -42,21 +34,22 @@ public class ContactDetails implements ValueObject {
         public Builder setEmail(String email) {
             this.email = email;
             return this;
-        }
 
+        }
         public Builder setMobile(String mobile) {
             this.mobile = mobile;
             return this;
-        }
 
+        }
         public Builder copy(ContactDetails contactDetails) {
             this.email = contactDetails.email;
             this.mobile = contactDetails.mobile;
             return this;
         }
-
         public ContactDetails build() {
             return new ContactDetails(this);
         }
     }
+
+
 }
