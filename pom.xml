@@ -44,6 +44,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <artifactId>spring-boot-resttestclient</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <scope>test</scope>
+        </dependency>
         <!-- Email validator -->
         <dependency>
             <groupId>commons-validator</groupId>
