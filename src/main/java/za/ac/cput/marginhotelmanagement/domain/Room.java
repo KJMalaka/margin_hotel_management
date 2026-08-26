@@ -3,6 +3,8 @@ package za.ac.cput.marginhotelmanagement.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import java.util.Objects;
@@ -11,12 +13,12 @@ import java.util.Objects;
 @Table(name = "rooms")
 public class Room {
     @Id
-    private String roomId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Optional: Added to auto-increment Long IDs in DB
+    private Long roomId; // Changed from String to Long
     private int roomNumber;
     private RoomType roomType;
     private double pricePerNight;
     private RoomStatus roomStatus;
-
 
     protected Room() {
     }
@@ -29,7 +31,7 @@ public class Room {
         this.roomStatus = builder.roomStatus;
     }
 
-    public String getRoomId() {
+    public Long getRoomId() { // Changed to Long
         return roomId;
     }
 
@@ -65,7 +67,7 @@ public class Room {
     @Override
     public String toString() {
         return "Room{" +
-                "roomId='" + roomId + '\'' +
+                "roomId=" + roomId + // Adjusted for Long output
                 ", roomNumber=" + roomNumber +
                 ", roomType=" + roomType +
                 ", pricePerNight=" + pricePerNight +
@@ -74,13 +76,13 @@ public class Room {
     }
 
     public static class Builder {
-        private String roomId;
+        private Long roomId; // Changed from String to Long
         private int roomNumber;
         private RoomType roomType;
         private double pricePerNight;
         private RoomStatus roomStatus;
 
-        public Builder setRoomId(String roomId) {
+        public Builder setRoomId(Long roomId) { // Changed to Long
             this.roomId = roomId;
             return this;
         }
