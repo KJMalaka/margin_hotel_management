@@ -22,8 +22,7 @@ public class BookingController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Booking> create(@RequestBody Booking incomingBooking) {
-
+    public ResponseEntity<?> create(@RequestBody Booking incomingBooking) {
 
         Booking bookingToSave = new Booking.Builder()
                 .copy(incomingBooking)
@@ -34,8 +33,16 @@ public class BookingController {
                 .setRoom(incomingBooking.getRoom())
                 .build();
 
-        Booking createdBooking = bookingService.create(bookingToSave);
-        return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
+        try {
+            Booking createdBooking = bookingService.create(bookingToSave);
+            return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
+        } catch (IllegalStateException e) {
+            // Room exists but is already booked for these dates
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (IllegalArgumentException e) {
+            // Stay period itself is invalid (null dates, check-out not after check-in)
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/read/{id}")

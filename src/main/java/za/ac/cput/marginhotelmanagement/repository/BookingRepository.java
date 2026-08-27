@@ -27,7 +27,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         "AND b.stayPeriod.checkInDate < :checkOutDate " +
                         "AND b.stayPeriod.checkOutDate > :checkInDate")
         List<Booking> findOverlappingBookings(
-                        @Param("roomId") String roomId,
+                        @Param("roomId") Long roomId,
                         @Param("checkInDate") LocalDateTime checkInDate,
                         @Param("checkOutDate") LocalDateTime checkOutDate);
 
@@ -36,10 +36,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         "AND b.stayPeriod.checkInDate < :checkOutDate " +
                         "AND b.stayPeriod.checkOutDate > :checkInDate")
         long countOverlappingBookings(
-                        @Param("roomId") String roomId,
+                        @Param("roomId") Long roomId,
                         @Param("checkInDate") LocalDateTime checkInDate,
                         @Param("checkOutDate") LocalDateTime checkOutDate);
 
         // Simple finder by room id
-        List<Booking> findByRoomId(String roomId);
+        List<Booking> findByRoomId(Long roomId);
 }

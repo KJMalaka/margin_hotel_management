@@ -15,6 +15,6 @@ public interface IBookingService extends IService<Booking, Long> {
 
     List<Booking> getAll();
 
-    boolean isRoomAvailable(String roomId, LocalDate checkInDate, LocalDate checkOutDate);
+    boolean isRoomAvailable(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
 
 }

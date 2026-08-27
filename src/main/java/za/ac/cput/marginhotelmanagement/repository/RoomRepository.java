@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room, String> {
+public interface RoomRepository extends JpaRepository<Room, Long> {
+
+    List<Room> findByRoomStatus(RoomStatus status);
 
     @Query("SELECT r FROM Room r WHERE NOT EXISTS (" +
             "SELECT b FROM Booking b WHERE b.room = r " +
