@@ -5,6 +5,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import za.ac.cput.marginhotelmanagement.domain.Room;
+import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
+import za.ac.cput.marginhotelmanagement.enums.RoomType;
+
+import java.util.List;
+import java.util.Optional;
 
 import java.time.LocalDateTime;
 import java.util.List;
