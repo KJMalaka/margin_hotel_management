@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.marginhotelmanagement.domain.Guest;
 import za.ac.cput.marginhotelmanagement.repository.GuestRepository;
+import za.ac.cput.marginhotelmanagement.util.Helper;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class GuestService implements IGuestService {
 
     @Override
     public Guest create(Guest guest) {
+        validate(guest);
         return guestRepository.save(guest);
     }
 
@@ -35,7 +37,35 @@ public class GuestService implements IGuestService {
 
     @Override
     public Guest update(Guest guest) {
+        validate(guest);
+        if (guest.getGuestId() == null || !guestRepository.existsById(guest.getGuestId())) {
+            return null; // controller turns this into a 404
+        }
         return guestRepository.save(guest);
+    }
+
+    // Mirrors the validation pattern used in PaymentService: real checks
+    // wired into the path a live request actually takes, using the
+    // already-existing Helper methods, thrown as plain IllegalArgumentException
+    // (caught in GuestController and turned into a 400) rather than a custom
+    // exception type.
+    private void validate(Guest guest) {
+        if (Helper.isNullOrEmpty(guest.getName())) {
+            throw new IllegalArgumentException("Guest name is required");
+        }
+        if (Helper.isNullOrEmpty(guest.getName().getFirstName())
+                || Helper.isNullOrEmpty(guest.getName().getLastName())) {
+            throw new IllegalArgumentException("Guest first name and last name are required");
+        }
+        if (Helper.isNullOrEmpty(guest.getContactDetails())) {
+            throw new IllegalArgumentException("Guest contact details are required");
+        }
+        if (Helper.isInvalidEmail(guest.getContactDetails().getEmail())) {
+            throw new IllegalArgumentException("A valid email is required");
+        }
+        if (Helper.isInvalidMobile(guest.getContactDetails().getMobile())) {
+            throw new IllegalArgumentException("Mobile number must be exactly 10 digits");
+        }
     }
 
     @Override

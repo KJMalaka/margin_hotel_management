@@ -27,12 +27,13 @@ public class GuestController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Guest> create(@RequestBody Guest guest) {
-        Guest createdGuest = guestService.create(guest);
-        if (createdGuest == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> create(@RequestBody Guest guest) {
+        try {
+            Guest createdGuest = guestService.create(guest);
+            return new ResponseEntity<>(createdGuest, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(createdGuest, HttpStatus.CREATED);
     }
 
     @GetMapping("/read/{id}")
@@ -46,12 +47,16 @@ public class GuestController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Guest> update(@RequestBody Guest guest) {
-        Guest updated = guestService.update(guest);
-        if (updated == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> update(@RequestBody Guest guest) {
+        try {
+            Guest updated = guestService.update(guest);
+            if (updated == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
