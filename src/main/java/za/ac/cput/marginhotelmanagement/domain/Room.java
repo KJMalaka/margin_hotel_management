@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import java.util.Objects;
@@ -16,8 +17,10 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Optional: Added to auto-increment Long IDs in DB
     private Long roomId; // Changed from String to Long
     private int roomNumber;
+    @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private double pricePerNight;
+    @Enumerated(EnumType.STRING)
     private RoomStatus roomStatus;
 
     protected Room() {

@@ -1,6 +1,8 @@
 package za.ac.cput.marginhotelmanagement.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import za.ac.cput.marginhotelmanagement.domain.Room;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
@@ -9,13 +11,18 @@ import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import java.util.List;
 import java.util.Optional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
-public interface RoomRepository extends JpaRepository<Room, Long> {
-    Optional<Room> findByRoomNumber(int roomNumber);
+public interface RoomRepository extends JpaRepository<Room, String> {
 
-    List<Room> findByRoomStatus(RoomStatus roomStatus);
-
-    List<Room> findByRoomType(RoomType roomType);
-
-
+    @Query("SELECT r FROM Room r WHERE NOT EXISTS (" +
+            "SELECT b FROM Booking b WHERE b.room = r " +
+            "AND b.stayPeriod.checkInDate < :checkOutDate " +
+            "AND b.stayPeriod.checkOutDate > :checkInDate)")
+    List<Room> findAvailableRooms(
+            @Param("checkInDate") LocalDateTime checkInDate,
+            @Param("checkOutDate") LocalDateTime checkOutDate);
 }
+

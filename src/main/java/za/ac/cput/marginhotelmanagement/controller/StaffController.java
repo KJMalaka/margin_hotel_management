@@ -51,7 +51,7 @@ public class StaffController {
         return staffService.createReceptionist(receptionist);
     }
 
-    @GetMapping("/requeptionist/read/{id}")
+    @GetMapping("/receptionist/read/{id}")
     public Receptionist readReceptionist(@PathVariable Long id) {
         return staffService.readReceptionist(id);}
 
