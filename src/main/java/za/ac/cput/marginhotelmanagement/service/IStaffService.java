@@ -12,12 +12,12 @@ public interface IStaffService {
     Manager createManager(Manager manager);
     Manager readManager(Long id);
     Manager updateManager(Manager manager);
-    boolean deleteManager(Long id);
+    void deleteManager(Long id);
     List<Manager> getAllManagers();
 
     Receptionist createReceptionist(Receptionist receptionist);
     Receptionist readReceptionist(Long id);
     Receptionist updateReceptionist(Receptionist receptionist);
-    boolean deleteReceptionist(Long id);
+    void deleteReceptionist(Long id);
     List<Receptionist> getAllReceptionists();
 }
