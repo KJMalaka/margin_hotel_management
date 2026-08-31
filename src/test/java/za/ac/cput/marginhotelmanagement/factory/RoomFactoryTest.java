@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
+
 class RoomFactoryTest {
     @Autowired
     private RoomRepository roomRepository;
