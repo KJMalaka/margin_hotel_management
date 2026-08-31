@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.controller;
+ za.ac.cput.marginhotelmanagement.controller;
 
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import za.ac.cput.marginhotelmanagement.domain.Room;
+ import za.ac.cput.marginhotelmanagement.controller.RoomController;
+ import za.ac.cput.marginhotelmanagement.domain.Room;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import za.ac.cput.marginhotelmanagement.service.IRoomService;

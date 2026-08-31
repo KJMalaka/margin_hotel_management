@@ -5,7 +5,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import java.util.Objects;
@@ -14,13 +16,21 @@ import java.util.Objects;
 @Table(name = "rooms")
 public class Room {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Optional: Added to auto-increment Long IDs in DB
-    private Long roomId; // Changed from String to Long
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long roomId;
+
+    @Column(unique = true, nullable = false)
     private int roomNumber;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RoomType roomType;
+
+    @Column(nullable = false)
     private double pricePerNight;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RoomStatus roomStatus;
 
     protected Room() {
@@ -34,7 +44,7 @@ public class Room {
         this.roomStatus = builder.roomStatus;
     }
 
-    public Long getRoomId() { // Changed to Long
+    public Long getRoomId() {
         return roomId;
     }
 
@@ -70,7 +80,7 @@ public class Room {
     @Override
     public String toString() {
         return "Room{" +
-                "roomId=" + roomId + // Adjusted for Long output
+                "roomId=" + roomId +
                 ", roomNumber=" + roomNumber +
                 ", roomType=" + roomType +
                 ", pricePerNight=" + pricePerNight +
@@ -79,13 +89,13 @@ public class Room {
     }
 
     public static class Builder {
-        private Long roomId; // Changed from String to Long
+        private Long roomId;
         private int roomNumber;
         private RoomType roomType;
         private double pricePerNight;
         private RoomStatus roomStatus;
 
-        public Builder setRoomId(Long roomId) { // Changed to Long
+        public Builder setRoomId(Long roomId) {
             this.roomId = roomId;
             return this;
         }
