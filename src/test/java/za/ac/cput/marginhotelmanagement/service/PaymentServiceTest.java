@@ -22,6 +22,7 @@ import za.ac.cput.marginhotelmanagement.factory.StayPeriodFactory;
 import za.ac.cput.marginhotelmanagement.repository.BookingRepository;
 import za.ac.cput.marginhotelmanagement.repository.GuestRepository;
 import za.ac.cput.marginhotelmanagement.repository.InvoiceRepository;
+import za.ac.cput.marginhotelmanagement.repository.PaymentRepository;
 import za.ac.cput.marginhotelmanagement.repository.RoomRepository;
 
 import java.time.LocalDate;
@@ -49,6 +50,9 @@ class PaymentServiceTest {
     @Autowired
     private InvoiceRepository invoiceRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     private Guest mockGuest;
     private Room mockRoom;
     private StayPeriod mockStayPeriod;
@@ -59,6 +63,12 @@ class PaymentServiceTest {
 
     @BeforeAll
     void setUp() {
+        paymentRepository.deleteAll();
+        invoiceRepository.deleteAll();
+        bookingRepository.deleteAll();
+        roomRepository.deleteAll();
+        guestRepository.deleteAll();
+
         mockGuest = GuestFactory.createGuest(
                 new Name.Builder()
                         .setFirstName("John")
@@ -70,11 +80,13 @@ class PaymentServiceTest {
                         .setMobile("0123456789")
                         .build());
         assertNotNull(mockGuest, "Mock guest creation failed");
-        mockGuest = guestRepository.save(mockGuest);
+        mockGuest = guestRepository.saveAndFlush(mockGuest);
+        mockGuest = guestRepository.findById(mockGuest.getGuestId()).orElseThrow();
 
         mockRoom = RoomFactory.createRoom(101, RoomType.SINGLE, 750.00, RoomStatus.AVAILABLE);
         assertNotNull(mockRoom, "Mock room creation failed");
-        mockRoom = roomRepository.save(mockRoom);
+        mockRoom = roomRepository.saveAndFlush(mockRoom);
+        mockRoom = roomRepository.findById(mockRoom.getRoomId()).orElseThrow();
 
         mockStayPeriod = StayPeriodFactory.createStayPeriod(
                 LocalDateTime.now().plusDays(1),

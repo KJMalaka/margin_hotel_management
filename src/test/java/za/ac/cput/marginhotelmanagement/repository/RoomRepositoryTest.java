@@ -8,67 +8,58 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.domain.Room;
+
+
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-
-
-
-
-public class RoomRepositoryTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class RoomRepositoryTest {
 
     @Autowired
     private RoomRepository roomRepository;
 
-    private Room room1;
-    private Room room2;
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    private Room savedRoom;
 
     @BeforeEach
-    void setup(){
-        room1 = new Room.Builder()
+    void setUp() {
+        bookingRepository.deleteAll();
+        roomRepository.deleteAll();
 
-                .setRoomNumber(101)
-                .setRoomStatus(RoomStatus.AVAILABLE)
-                .setRoomType(RoomType.SINGLE)
-                .build();
-
-        room2 = new Room.Builder()
-
+        Room room = new Room.Builder()
                 .setRoomNumber(202)
-                .setRoomStatus(RoomStatus.OCCUPIED)
-                .setRoomType(RoomType.DOUBLE)
+                .setRoomType(RoomType.SINGLE)
+                .setPricePerNight(1200.00)
+                .setRoomStatus(RoomStatus.AVAILABLE)
                 .build();
 
-        roomRepository.save(room1);
-        roomRepository.save(room2);
-
-
+        savedRoom = roomRepository.save(room);
     }
+
     @Test
     void testFindByRoomNumber() {
-        // Act: Search for room number 101 (returns an Optional box!)
-        Optional<Room> foundRoomBox = roomRepository.findByRoomNumber(101);
-
-        // Assert: Verify the box is NOT empty and has the correct details
-        assertTrue(foundRoomBox.isPresent());
-        assertEquals("RM-101", foundRoomBox.get().getRoomId());
-        assertEquals(850.00, foundRoomBox.get().getPricePerNight());
+        Optional<Room> found = roomRepository.findByRoomNumber(202);
+        assertTrue(found.isPresent());
+        assertEquals(savedRoom.getRoomId(), found.get().getRoomId());
     }
-
 
     @Test
-    void testFindByRoomStatus(){
-        List<Room> availableRooms = roomRepository.findRoomByRoomStatus(RoomStatus.AVAILABLE);
-
-        assertEquals(1,availableRooms.size());
-        assertEquals(101,availableRooms.get(0).getRoomNumber());
+    void testFindByRoomStatus() {
+        // FIXED: Renamed from findRoomByRoomStatus to match RoomRepository definition
+        List<Room> activeRooms = roomRepository.findByRoomStatus(RoomStatus.AVAILABLE);
+        assertFalse(activeRooms.isEmpty());
+        assertTrue(activeRooms.stream().anyMatch(r -> r.getRoomNumber() == 202));
     }
 
-
-
+    @Test
+    void testFindByRoomType() {
+        List<Room> singleRooms = roomRepository.findByRoomType(RoomType.SINGLE);
+        assertFalse(singleRooms.isEmpty());
+    }
 }

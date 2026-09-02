@@ -25,14 +25,13 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private BookingChannel bookingChannel;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+   @ManyToOne
     @JoinColumn(name = "guest_id")
     private Guest guest;
 
-
-   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+   @ManyToOne
    @JoinColumn(name = "room_id")
-    private Room room;
+   private Room room;
 
     public Booking() {
     }

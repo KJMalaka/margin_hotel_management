@@ -26,7 +26,7 @@ class BookingFactoryTest {
                 .build();
 
         this.room = new Room.Builder()
-                .setRoomId("RM-202")
+                .setRoomId(202L)
                 .setRoomNumber(202)
                 .build();
 

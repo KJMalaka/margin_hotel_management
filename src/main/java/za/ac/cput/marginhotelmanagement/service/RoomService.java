@@ -22,6 +22,10 @@ public class RoomService implements IRoomService {
 
     @Override
     public Room create(Room room) {
+        // Business rule: Enforce the uniqueness constraint before saving to the DB
+        if (roomRepository.findByRoomNumber(room.getRoomNumber()).isPresent()) {
+            throw new IllegalArgumentException("A room with number " + room.getRoomNumber() + " already exists.");
+        }
         return roomRepository.save(room);
     }
 
@@ -37,7 +41,7 @@ public class RoomService implements IRoomService {
 
     @Override
     public Room update(Room room) {
-        if (roomRepository.existsById(room.getRoomId())) {
+        if (room != null && room.getRoomId() != null && roomRepository.existsById(room.getRoomId())) {
             return roomRepository.save(room);
         }
         return null;
@@ -57,15 +61,13 @@ public class RoomService implements IRoomService {
         return roomRepository.findByRoomStatus(status);
     }
 
-    //Called from BookingController.create() — that's the separate double-booking
     @Override
     public List<Room> findAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate) {
         if (checkInDate == null || checkOutDate == null || !checkInDate.isBefore(checkOutDate)) {
             return List.of();
         }
-
-        LocalDateTime start = checkInDate.atStartOfDay();
-        LocalDateTime end = checkOutDate.atTime(23, 59, 59, 999_999_999);
-        return roomRepository.findAvailableRooms(start, end);
+        return roomRepository.findAvailableRooms(
+                checkInDate.atStartOfDay(),
+                checkOutDate.atTime(23, 59, 59, 999_999_999));
     }
 }

@@ -12,8 +12,20 @@ import za.ac.cput.marginhotelmanagement.domain.Invoice;
 import za.ac.cput.marginhotelmanagement.enums.BookingChannel;
 import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;
 import za.ac.cput.marginhotelmanagement.factory.BookingFactory;
+import za.ac.cput.marginhotelmanagement.factory.GuestFactory;
 import za.ac.cput.marginhotelmanagement.factory.InvoiceFactory;
+import za.ac.cput.marginhotelmanagement.factory.RoomFactory;
 import za.ac.cput.marginhotelmanagement.repository.BookingRepository;
+import za.ac.cput.marginhotelmanagement.repository.GuestRepository;
+import za.ac.cput.marginhotelmanagement.repository.InvoiceRepository;
+import za.ac.cput.marginhotelmanagement.repository.PaymentRepository;
+import za.ac.cput.marginhotelmanagement.repository.RoomRepository;
+import za.ac.cput.marginhotelmanagement.domain.Guest;
+import za.ac.cput.marginhotelmanagement.domain.Room;
+import za.ac.cput.marginhotelmanagement.domain.Name;
+import za.ac.cput.marginhotelmanagement.domain.ContactDetails;
+import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
+import za.ac.cput.marginhotelmanagement.enums.RoomType;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,23 +43,63 @@ class InvoiceServiceTest {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private GuestRepository guestRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     private Invoice mockInvoice;
     private Booking mockBooking;
 
     @BeforeAll
     void setUp() {
+        paymentRepository.deleteAll();
+        invoiceRepository.deleteAll();
+        bookingRepository.deleteAll();
+        roomRepository.deleteAll();
+        guestRepository.deleteAll();
+
+        Guest guest = GuestFactory.createGuest(
+                new Name.Builder()
+                        .setFirstName("Jane")
+                        .setMiddleName("A")
+                        .setLastName("Doe")
+                        .build(),
+                new ContactDetails.Builder()
+                        .setEmail("jane.doe@example.com")
+                        .setMobile("0112233444")
+                        .build()
+        );
+        assertNotNull(guest, "Guest creation failed");
+        guest = guestRepository.saveAndFlush(guest);
+        guest = guestRepository.findById(guest.getGuestId()).orElseThrow();
+
+        Room room = RoomFactory.createRoom(303, RoomType.DOUBLE, 900.00, RoomStatus.AVAILABLE);
+        assertNotNull(room, "Room creation failed");
+        room = roomRepository.saveAndFlush(room);
+        room = roomRepository.findById(room.getRoomId()).orElseThrow();
+
         mockBooking = BookingFactory.createBooking(
                 LocalDate.now(),
-                null,
+                new za.ac.cput.marginhotelmanagement.domain.StayPeriod.Builder()
+                        .setCheckInDate(LocalDate.now().plusDays(1).atStartOfDay())
+                        .setCheckOutDate(LocalDate.now().plusDays(3).atStartOfDay())
+                        .build(),
                 BookingChannel.ONLINE,
-                null,
-                null
+                guest,
+                room
         );
         assertNotNull(mockBooking, "Mock booking creation failed");
-        mockBooking = bookingRepository.save(mockBooking);
+        mockBooking = bookingRepository.saveAndFlush(mockBooking);
 
         mockInvoice = InvoiceFactory.createInvoice(
-                1L,
                 "INV-TEST-001",
                 1500.00,
                 InvoiceStatus.PENDING,

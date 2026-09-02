@@ -8,4 +8,16 @@ public interface IService<T, ID> {
     T update(T t);
     boolean delete(T t);
     List<T> findAll();
+
+    /**
+     * Convenience default method to delete an entity by its id.
+     * Implementations that can perform a more efficient delete-by-id
+     * may override this method. The default behaviour reads the entity
+     * then delegates to delete(T).
+     */
+    default boolean deleteById(ID id) {
+        T entity = read(id);
+        if (entity == null) return false;
+        return delete(entity);
+    }
 }

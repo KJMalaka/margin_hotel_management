@@ -41,5 +41,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         @Param("checkOutDate") LocalDateTime checkOutDate);
 
         // Simple finder by room id
-        List<Booking> findByRoomId(Long roomId);
+        List<Booking> findByRoom_RoomId(Long roomId);
 }

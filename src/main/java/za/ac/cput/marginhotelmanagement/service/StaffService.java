@@ -5,7 +5,9 @@ package za.ac.cput.marginhotelmanagement.service;
    Date: 12 July 2026 */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import za.ac.cput.marginhotelmanagement.domain.Manager;
 import za.ac.cput.marginhotelmanagement.domain.Receptionist;
 import za.ac.cput.marginhotelmanagement.repository.ManagerRepository;
@@ -21,7 +23,7 @@ public class StaffService implements IStaffService {
 
     @Autowired
     public StaffService(ManagerRepository managerRepository,
-                            ReceptionistRepository receptionistRepository) {
+                        ReceptionistRepository receptionistRepository) {
         this.managerRepository = managerRepository;
         this.receptionistRepository = receptionistRepository;
     }
@@ -33,17 +35,26 @@ public class StaffService implements IStaffService {
 
     @Override
     public Manager readManager(Long id) {
-        return managerRepository.findById(id).orElse(null);
+        return managerRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Manager not found with id: " + id));
     }
 
     @Override
     public Manager updateManager(Manager manager) {
+        if (!managerRepository.existsById(manager.getStaffId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Manager not found with id: " + manager.getStaffId());
+        }
         return managerRepository.save(manager);
     }
 
     @Override
     public boolean deleteManager(Long id) {
-        if (!managerRepository.existsById(id)) return false;
+        if (!managerRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Manager not found with id: " + id);
+        }
         managerRepository.deleteById(id);
         return true;
     }
@@ -60,17 +71,26 @@ public class StaffService implements IStaffService {
 
     @Override
     public Receptionist readReceptionist(Long id) {
-        return receptionistRepository.findById(id).orElse(null);
+        return receptionistRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Receptionist not found with id: " + id));
     }
 
     @Override
     public Receptionist updateReceptionist(Receptionist receptionist) {
+        if (!receptionistRepository.existsById(receptionist.getStaffId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Receptionist not found with id: " + receptionist.getStaffId());
+        }
         return receptionistRepository.save(receptionist);
     }
 
     @Override
     public boolean deleteReceptionist(Long id) {
-        if (!receptionistRepository.existsById(id)) return false;
+        if (!receptionistRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Receptionist not found with id: " + id);
+        }
         receptionistRepository.deleteById(id);
         return true;
     }

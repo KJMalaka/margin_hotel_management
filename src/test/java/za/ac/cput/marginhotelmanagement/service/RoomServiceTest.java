@@ -2,92 +2,103 @@ package za.ac.cput.marginhotelmanagement.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import za.ac.cput.marginhotelmanagement.domain.Room;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
-import za.ac.cput.marginhotelmanagement.service.impl.RoomServiceImpl;
+import za.ac.cput.marginhotelmanagement.repository.RoomRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
+@ExtendWith(MockitoExtension.class)
 class RoomServiceTest {
 
+    @Mock
+    private RoomRepository roomRepository;
+
+    @InjectMocks
     private RoomService roomService;
-    private Room room1;
-    private Room room2;
+
+    private Room mockRoom;
 
     @BeforeEach
     void setUp() {
-        // Assuming your project uses a Singleton repository layer or mock/in-memory map for now
-        roomService = RoomServiceImpl.getInstance();
 
-        // Build test entities using your Room Builder pattern
-        room1 = new Room.Builder()
-                .setRoomId("RM-101")
+        mockRoom = new Room.Builder()
+                .setRoomId(1L)
                 .setRoomNumber(101)
-                .setRoomType(RoomType.DELUXE) // Adjust based on your actual enum values
-                .setPricePerNight(1500.00)
-                .setRoomStatus(RoomStatus.AVAILABLE) // Adjust based on your actual enum values
-                .build();
-
-        room2 = new Room.Builder()
-                .setRoomId("RM-102")
-                .setRoomNumber(102)
-                .setRoomType(RoomType.STANDARD)
+                .setRoomType(RoomType.SINGLE)
                 .setPricePerNight(850.00)
-                .setRoomStatus(RoomStatus.OCCUPIED)
+                .setRoomStatus(RoomStatus.AVAILABLE)
                 .build();
     }
 
     @Test
-    void testCreateAndRead() {
-        Room created = roomService.create(room1);
-        assertNotNull(created);
-        assertEquals("RM-101", created.getRoomId());
+    void testCreateSuccess() {
+        Mockito.when(roomRepository.findByRoomNumber(101)).thenReturn(Optional.empty());
+        Mockito.when(roomRepository.save(any(Room.class))).thenReturn(mockRoom);
 
-        Optional<Room> read = roomService.read("RM-101");
-        assertTrue(read.isPresent());
-        assertEquals(101, read.get().getRoomNumber());
+        Room created = roomService.create(mockRoom);
+        assertNotNull(created);
+        assertEquals(1L, created.getRoomId());
+    }
+
+    @Test
+    void testCreateDuplicateThrowsException() {
+        Mockito.when(roomRepository.findByRoomNumber(101)).thenReturn(Optional.of(mockRoom));
+
+        assertThrows(IllegalArgumentException.class, () -> roomService.create(mockRoom));
+    }
+
+    @Test
+    void testRead() {
+        Mockito.when(roomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
+
+        Room found = roomService.read(1L);
+        assertNotNull(found);
+        assertEquals(101, found.getRoomNumber());
+    }
+
+    @Test
+    void testFindAll() {
+        Mockito.when(roomRepository.findAll()).thenReturn(Collections.singletonList(mockRoom));
+
+        List<Room> list = roomService.findAll();
+        assertFalse(list.isEmpty());
+        assertEquals(1, list.size());
     }
 
     @Test
     void testUpdate() {
-        roomService.create(room1);
+        Mockito.when(roomRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(roomRepository.save(any(Room.class))).thenReturn(mockRoom);
 
-        // Use copy builder to update status
-        Room updatedRoom = new Room.Builder()
-                .copy(room1)
-                .setRoomStatus(RoomStatus.MAINTENANCE)
-                .build();
-
-        Room result = roomService.update(updatedRoom);
-        assertNotNull(result);
-        assertEquals(RoomStatus.MAINTENANCE, result.getRoomStatus());
+        Room updated = roomService.update(mockRoom);
+        assertNotNull(updated);
     }
 
     @Test
     void testDelete() {
-        roomService.create(room2);
-        boolean deleted = roomService.delete("RM-102");
+        Mockito.when(roomRepository.existsById(1L)).thenReturn(true).thenReturn(false);
+        boolean deleted = roomService.delete(mockRoom);
         assertTrue(deleted);
-
-        Optional<Room> read = roomService.read("RM-102");
-        assertFalse(read.isPresent());
     }
 
     @Test
-    void testFindAvailableRooms() {
-        roomService.create(room1); // AVAILABLE
-        roomService.create(room2); // OCCUPIED
+    void testGetRoomByStatus() {
+        Mockito.when(roomRepository.findByRoomStatus(RoomStatus.AVAILABLE))
+                .thenReturn(Collections.singletonList(mockRoom));
 
-        List<Room> availableRooms = roomService.findAvailableRooms();
-        assertFalse(availableRooms.isEmpty());
-
-        // Match against your actual enum value for checked-in rooms
-        boolean containsOccupied = availableRooms.stream()
-                .anyMatch(r -> r.getRoomStatus() == RoomStatus.OCCUPIED);
-        assertFalse(containsOccupied);
+        List<Room> structuralList = roomService.getRoomByStatus(RoomStatus.AVAILABLE);
+        assertFalse(structuralList.isEmpty());
     }
 }

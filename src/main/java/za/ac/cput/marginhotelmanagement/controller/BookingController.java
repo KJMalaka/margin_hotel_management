@@ -4,10 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.marginhotelmanagement.domain.Booking;
+import za.ac.cput.marginhotelmanagement.dtos.BookingDto;
+import za.ac.cput.marginhotelmanagement.dtos.CreateBookingRequest;
+import za.ac.cput.marginhotelmanagement.dtos.UpdateBookingRequest;
 import za.ac.cput.marginhotelmanagement.service.BookingService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -22,32 +23,22 @@ public class BookingController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody Booking incomingBooking) {
-
-        Booking bookingToSave = new Booking.Builder()
-                .copy(incomingBooking)
-                .setBookingDate(incomingBooking.getBookingDate() != null ? incomingBooking.getBookingDate() : LocalDate.now())
-                .setBookingChannel(incomingBooking.getBookingChannel())
-                .setStayPeriod(incomingBooking.getStayPeriod())
-                .setGuest(incomingBooking.getGuest())
-                .setRoom(incomingBooking.getRoom())
-                .build();
-
+    public ResponseEntity<?> create(@RequestBody CreateBookingRequest request) {
         try {
-            Booking createdBooking = bookingService.create(bookingToSave);
+            BookingDto createdBooking = bookingService.createBooking(request);
             return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
         } catch (IllegalStateException e) {
             // Room exists but is already booked for these dates
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         } catch (IllegalArgumentException e) {
-            // Stay period itself is invalid (null dates, check-out not after check-in)
+            // Stay period itself is invalid, or the guest/room reference doesn't exist
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/read/{id}")
-    public ResponseEntity<Booking> read(@PathVariable Long id) {
-        Booking booking = bookingService.read(id);
+    public ResponseEntity<BookingDto> read(@PathVariable Long id) {
+        BookingDto booking = bookingService.readBooking(id);
         if (booking != null) {
             return new ResponseEntity<>(booking, HttpStatus.OK);
         } else {
@@ -56,17 +47,21 @@ public class BookingController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Booking> update(@RequestBody Booking booking) {
-        Booking updated = bookingService.update(booking);
-        if (updated == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // This is what is triggering!
+    public ResponseEntity<?> update(@RequestBody UpdateBookingRequest request) {
+        try {
+            BookingDto updated = bookingService.updateBooking(request);
+            if (updated == null) {
+                return new ResponseEntity<>("No booking found with ID #" + request.getBookingId(), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean deleted = bookingService.delete(id);
+        boolean deleted = bookingService.deleteBooking(id);
         if (!deleted) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -74,8 +69,8 @@ public class BookingController {
     }
 
     @GetMapping("/getall")
-    public ResponseEntity<List<Booking>> getAll() {
-        List<Booking> bookings = bookingService.getAll();
+    public ResponseEntity<List<BookingDto>> getAll() {
+        List<BookingDto> bookings = bookingService.getAllBookings();
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 }
