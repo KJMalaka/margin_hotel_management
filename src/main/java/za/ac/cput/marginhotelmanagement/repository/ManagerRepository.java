@@ -12,4 +12,6 @@ import za.ac.cput.marginhotelmanagement.domain.Manager;
 public interface ManagerRepository extends JpaRepository<Manager, Long> {
     Manager findManagerByStaffId(Long staffId);
     Manager findManagerByOfficeNumber(String officeNumber);
+
+    boolean existsByContactDetails_Email(String email);
 }

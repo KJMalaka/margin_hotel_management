@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/payment/**").permitAll() // TEMP: remove before committing
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/room/**").permitAll()
@@ -55,8 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/booking/**",
                                 "/guest/**",
-                                "/invoice/**",
-                                "/payment/**").hasAnyRole("RECEPTIONIST", "ADMIN")
+                                "/invoice/**").hasAnyRole("RECEPTIONIST", "ADMIN") //Payment is missing.
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationConfig, UsernamePasswordAuthenticationFilter.class)

@@ -21,4 +21,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findPaymentByPaymentDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     List<Payment> findPaymentByPaymentId(Long paymentId);
+
+    boolean existsByInvoice_InvoiceId(Long invoiceId);
 }
