@@ -11,6 +11,7 @@ import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
@@ -23,4 +24,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     // Find invoices by booking ID
     List<Invoice> findByBooking_BookingId(Long bookingId);
+
+    Optional<Invoice> findByInvoiceId(Long invoiceId);
+
+    Optional<Invoice> findByReference(String reference);
 }

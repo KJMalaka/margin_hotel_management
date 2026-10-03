@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos;
 /*
     Author: Lithabile Lalela (221340963)
     Date :30 August 2026

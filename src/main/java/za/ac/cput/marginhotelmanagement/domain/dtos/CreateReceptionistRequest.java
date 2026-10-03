@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,12 +10,12 @@ import lombok.Getter;
    */
 @AllArgsConstructor
 @Getter
-public class ReceptionistDto {
+public class ManagerDto {
     private Long staffId;
     private String firstName;
     private String middleName;
     private String lastName;
     private String email;
     private String mobile;
-    private String deskNumber;
+    private String officeNumber;
 }

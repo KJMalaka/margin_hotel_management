@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos;
 /*
    Author: Katlego Malaka (230443370)
    Date: 25 August 2026

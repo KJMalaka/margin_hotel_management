@@ -1,14 +1,16 @@
-package za.ac.cput.marginhotelmanagement.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /*
+   Flat shape returned to the client on reads.
    Author: Lithabile Lalela (221340963)
    Date: 30 August 2026
    */
-
-import lombok.Data;
-
-@Data
-public class UpdateReceptionistRequest {
+@AllArgsConstructor
+@Getter
+public class ReceptionistDto {
     private Long staffId;
     private String firstName;
     private String middleName;

@@ -1,51 +1,66 @@
 # Margin Hotel Management System
 
-This repository contains the core backend application for **Margin Hotel**, an established hotel group with several branches across South Africa. The project transitions the hotel's traditional paper-based front-desk processes to a modern, digitized platform.
+Backend for Margin Hotel — a capstone project (ADP372S) that digitises front-desk operations for a small hotel chain in South Africa.
 
-This application is developed as part of the **Applications Development Practice 3 (ADP372S)** capstone group project.
+## Project summary
 
-## 🚀 Project Overview
+This repository contains the complete backend (domain model → REST controllers). The public booking website and staff UI are out of scope.
 
-The Margin Hotel Management System delivers a robust, web-enabled backend built from the domain model up to the REST controllers that expose hotel operations as web services.
+## Tech stack
 
-### System Scope
+- Java 21 (required — annotation processors for Lombok/MapStruct do not run correctly on newer JDKs)
+- Spring Boot 4.1.0
+- Spring Data JPA / Hibernate
+- Spring Security 6 (stateless, JWT-based)
+- MySQL (runtime)
+- Maven (wrapper included)
+- MapStruct, Lombok (annotation processors), Flyway
 
-The scope of this project is **back-end only** (domain layer → REST controllers). The public booking website and the internal staff portal front-end views are out of scope and will be built by another team.
+(See pom.xml for exact dependencies and versions.)
 
-The platform serves two separated audiences across three distinct booking channels with no shared interface:
+## Getting started
 
-- **Guests (The Public):** Browse room availability and book rooms directly through a public booking website (`ONLINE` channel).
-- **Staff (Internal Portal):**
-  - **Receptionists:** Check availability, create bookings on behalf of guests (`WALK_IN` or `TELEPHONIC` channels), and process payments.
-  - **Managers:** Oversee overall operations and review critical business data.
+1. Make sure MySQL is running locally and you have a `root` user with a password (or update `application.properties` to match your own credentials).
+2. Copy `src/main/resources/application.properties` and set your own `spring.datasource.password`, `jwt.secret` and `app.admin.password`. Never commit real secrets — these are for local development only.
+3. Run the app:
 
-The system supports a fixed structure of **1 manager and 5 receptionists**.
+```
+./mvnw.cmd spring-boot:run
+```
 
-## 🛠️ Tech Stack & Architecture
+4. The API is served at `http://localhost:8080/marginhotel`.
 
-| Category | Choice |
-|---|---|
-| Language | Java 21 |
-| Framework | Java Spring Boot |
-| Architecture | Domain-Driven Design (DDD) layers |
-| Persistence | Jakarta Persistence API (JPA) / Hibernate |
-| Database | MySQL |
-| Testing | JUnit 5 (strictly following Test-Driven Development cycles) |
-| Build Tool | Maven |
-| Design Patterns | Builder Pattern (implemented without Lombok) |
+On first run, `AdminSeeder` creates a default admin account (email/password from `app.admin.email` / `app.admin.password` in `application.properties`) so you can log in immediately. If `app.demo-data.enabled=true`, `DemoDataSeeder` also loads sample rooms, guests, bookings, invoices and payments so the app has data to demo/mark against.
 
-## 🛡️ Core Business & Validation Rules
+## API reference
 
-> 💡 **Crucial Design Rule:** Code to abstraction, not concretion. Strict package boundaries must be observed across layers (`domain`, `factory`, `repository`, `service`, `controller`).
+Detailed controller routes and example requests are documented in API_ENDPOINTS.md in the repository root. Key base paths exposed by the controllers:
 
-- **Mandatory Fields:** All attributes are strictly mandatory and must be validated before an instance is created, with the sole exception of `Name.middleName`.
-- **No Null Saves:** No attribute is allowed to be saved to the database as `null` or as an empty string (except `middleName`).
-- **Factory Failure Handling:** On any validation failure, the object factory must return `null` instead of throwing an `IllegalArgumentException`.
-- **Anti-Double-Booking Logic:** A room cannot be double-booked. No two bookings for the exact same room may overlap in their dates. This rule is strictly enforced within the service layer, not the database.
-- **Payment Settlement:** One `Booking` produces exactly one `Invoice`, and one `Invoice` is settled by exactly one `Payment`. Split or partial payments are not supported.
+- `/auth` — register, login, check-email
+- `/booking`
+- `/guest`
+- `/invoice`
+- `/payment`
+- `/room`
+- `/staff`
 
-## 📊 Domain Model UML Diagram
+## Core business rules (high level)
 
-![Margin Hotel UML Diagram](Margin%20Hotel%20UML.jpeg)
+- All domain attributes are mandatory except Name.middleName.
+- Factories return null on validation failures (do not throw IllegalArgumentException).
+- No null or empty-string values are persisted for required fields.
+- Anti-double-booking enforced in the service layer (no overlapping bookings for same room).
+- 1 Booking → 1 Invoice → 1 Payment (no partial payments supported).
+- A guest is matched to their account by email, not by ID — registering with a known email links to that guest instead of duplicating them.
 
-This UML diagram illustrates the complete domain model for the Margin Hotel Management System, including all entities, relationships, and value objects used throughout the application.
+## Security
+
+Authentication is JWT-based (stateless — no sessions). Roles are `USER`, `RECEPTIONIST` and `ADMIN`.
+
+- Anyone can register and log in via `/auth/**`.
+- `/room/**` is readable by anyone; creating, updating or deleting rooms requires `ADMIN`.
+- `/booking/**`, `/guest/**` and `/invoice/**` require `RECEPTIONIST` or `ADMIN`.
+- `/staff/**` requires `ADMIN`.
+- Everything else requires a valid, logged-in user by default.
+
+To call a protected endpoint, log in via `POST /auth/login` and send the returned token as `Authorization: Bearer <token>` on subsequent requests.

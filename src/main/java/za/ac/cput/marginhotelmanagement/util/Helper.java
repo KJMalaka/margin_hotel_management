@@ -108,4 +108,8 @@ public class Helper {
         return isNullOrEmpty(mobile) || !mobile.matches("\\d{10}");
     }
 
+    //Returns true if the password is null, empty, or shorter than 8 characters.
+    public static boolean isInvalidPassword(String password) {
+        return isNullOrEmpty(password) || password.trim().length() < 8;
+    }
 }

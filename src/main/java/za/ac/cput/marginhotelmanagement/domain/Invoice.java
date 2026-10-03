@@ -33,6 +33,11 @@ public class Invoice {
 
     }
 
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Invoice (Builder builder){
         this.invoiceId = builder.invoiceId;
         this.reference = builder.reference;

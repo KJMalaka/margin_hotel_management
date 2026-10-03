@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.marginhotelmanagement.domain.Manager;
 import za.ac.cput.marginhotelmanagement.domain.Receptionist;
-import za.ac.cput.marginhotelmanagement.dtos.*;
+import za.ac.cput.marginhotelmanagement.domain.dtos.*;
 import za.ac.cput.marginhotelmanagement.mappers.StaffMapper;
 import za.ac.cput.marginhotelmanagement.service.StaffService;
 

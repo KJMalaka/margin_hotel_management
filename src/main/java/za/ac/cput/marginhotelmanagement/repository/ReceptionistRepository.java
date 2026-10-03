@@ -12,4 +12,6 @@ import za.ac.cput.marginhotelmanagement.domain.Receptionist;
 public interface ReceptionistRepository extends JpaRepository<Receptionist, Long> {
     Receptionist findReceptionistByStaffId(Long staffId);
     Receptionist findReceptionistByDeskNumber(String deskNumber);
+
+    boolean existsByContactDetails_Email(String email);
 }

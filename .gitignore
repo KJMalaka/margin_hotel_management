@@ -19,6 +19,9 @@ target/
 *.iml
 *.ipr
 
+### Gitignore ###
+.gitignore
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -34,3 +37,6 @@ build/
 
 ### Claude Code ###
 .claude/
+
+### macOS ###
+.DS_Store
