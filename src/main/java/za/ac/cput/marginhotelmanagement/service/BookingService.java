@@ -46,9 +46,6 @@ public class BookingService implements IBookingService {
     @Override
     public Booking create(Booking booking) {
         // Reject overlapping bookings for the same room before saving.
-        // Helper.isRoomAvailable (called via isRoomAvailable below) also
-        // throws IllegalArgumentException if the stay period itself is
-        // invalid (null dates, or check-out not after check-in).
         if (booking.getRoom() != null && booking.getStayPeriod() != null) {
             LocalDate checkIn = booking.getStayPeriod().getCheckInDate().toLocalDate();
             LocalDate checkOut = booking.getStayPeriod().getCheckOutDate().toLocalDate();
