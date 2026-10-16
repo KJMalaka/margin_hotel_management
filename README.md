@@ -1,66 +1,60 @@
 # Margin Hotel Management System
 
-Backend for Margin Hotel — a capstone project (ADP372S) that digitises front-desk operations for a small hotel chain in South Africa.
+## Project overview
 
-## Project summary
+Margin Hotel Management System is an academic project that provides a REST API for common hotel operations. It supports managing rooms, guests, bookings, staff, invoices, and payments. This repository contains the backend application.
 
-This repository contains the complete backend (domain model → REST controllers). The public booking website and staff UI are out of scope.
+The companion [Margin Hotel frontend](https://github.com/Madondo07/margin-hotel-frontend) is built with Next.js and TypeScript. It supports public room browsing and booking, as well as an administration dashboard for staff.
 
-## Tech stack
+## Technology
 
-- Java 21 (required — annotation processors for Lombok/MapStruct do not run correctly on newer JDKs)
+- Java 17
 - Spring Boot 4.1.0
-- Spring Data JPA / Hibernate
-- Spring Security 6 (stateless, JWT-based)
-- MySQL (runtime)
-- Maven (wrapper included)
-- MapStruct, Lombok (annotation processors), Flyway
+- Spring Web, Spring Data JPA, and Spring Security
+- MySQL
+- Maven Wrapper
+- Flyway database migration support
 
-(See pom.xml for exact dependencies and versions.)
+## Requirements
 
-## Getting started
+- JDK 17 or later
+- MySQL server
 
-1. Make sure MySQL is running locally and you have a `root` user with a password (or update `application.properties` to match your own credentials).
-2. Copy `src/main/resources/application.properties` and set your own `spring.datasource.password`, `jwt.secret` and `app.admin.password`. Never commit real secrets — these are for local development only.
-3. Run the app:
+## Setup and run
 
+1. Clone the repository and start MySQL.
+2. Configure the application’s database connection, JWT signing secret, and administrator credentials. Supply these as environment variables rather than committing credentials:
+
+   - `SPRING_DATASOURCE_URL`
+   - `SPRING_DATASOURCE_USERNAME`
+   - `SPRING_DATASOURCE_PASSWORD`
+   - `JWT_SECRET`
+   - `APP_ADMIN_EMAIL`
+   - `APP_ADMIN_PASSWORD`
+
+   The default database URL targets a local MySQL database named `marginhoteldb`.
+3. From the repository root, start the application:
+
+   ```powershell
+   .\mvnw.cmd spring-boot:run
+   ```
+
+The API is available at `http://localhost:8080/marginhotel`. On startup, the application creates an administrator account using the configured email and password if that account does not already exist. Demo data is enabled by default; set `APP_DEMO_DATA_ENABLED=false` to disable it.
+
+## API documentation
+
+For routes, request and response types, and endpoint examples, see [API_ENDPOINTS.md](./API_ENDPOINTS.md).
+
+## Tests
+
+Run the test suite from the repository root:
+
+```powershell
+.\mvnw.cmd test
 ```
-./mvnw.cmd spring-boot:run
-```
 
-4. The API is served at `http://localhost:8080/marginhotel`.
+## Project structure
 
-On first run, `AdminSeeder` creates a default admin account (email/password from `app.admin.email` / `app.admin.password` in `application.properties`) so you can log in immediately. If `app.demo-data.enabled=true`, `DemoDataSeeder` also loads sample rooms, guests, bookings, invoices and payments so the app has data to demo/mark against.
-
-## API reference
-
-Detailed controller routes and example requests are documented in API_ENDPOINTS.md in the repository root. Key base paths exposed by the controllers:
-
-- `/auth` — register, login, check-email
-- `/booking`
-- `/guest`
-- `/invoice`
-- `/payment`
-- `/room`
-- `/staff`
-
-## Core business rules (high level)
-
-- All domain attributes are mandatory except Name.middleName.
-- Factories return null on validation failures (do not throw IllegalArgumentException).
-- No null or empty-string values are persisted for required fields.
-- Anti-double-booking enforced in the service layer (no overlapping bookings for same room).
-- 1 Booking → 1 Invoice → 1 Payment (no partial payments supported).
-- A guest is matched to their account by email, not by ID — registering with a known email links to that guest instead of duplicating them.
-
-## Security
-
-Authentication is JWT-based (stateless — no sessions). Roles are `USER`, `RECEPTIONIST` and `ADMIN`.
-
-- Anyone can register and log in via `/auth/**`.
-- `/room/**` is readable by anyone; creating, updating or deleting rooms requires `ADMIN`.
-- `/booking/**`, `/guest/**` and `/invoice/**` require `RECEPTIONIST` or `ADMIN`.
-- `/staff/**` requires `ADMIN`.
-- Everything else requires a valid, logged-in user by default.
-
-To call a protected endpoint, log in via `POST /auth/login` and send the returned token as `Authorization: Bearer <token>` on subsequent requests.
+- `src/main/java` — application, domain, controller, repository, and service code
+- `src/main/resources` — application configuration and web resources
+- `src/test/java` — automated tests
