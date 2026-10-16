@@ -8,7 +8,8 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.domain.Room;
-
+import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
+import za.ac.cput.marginhotelmanagement.enums.RoomType;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,25 +17,21 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // Uses your actual app database config for tests
 class RoomRepositoryTest {
 
     @Autowired
     private RoomRepository roomRepository;
 
-    @Autowired
-    private BookingRepository bookingRepository;
-
     private Room savedRoom;
 
     @BeforeEach
     void setUp() {
-        bookingRepository.deleteAll();
-        roomRepository.deleteAll();
+        roomRepository.deleteAll(); // Clean state before each test run
 
         Room room = new Room.Builder()
                 .setRoomNumber(202)
-                .setRoomType(RoomType.SINGLE)
+                .setRoomType(RoomType.SINGLE) // Using known structural enum type
                 .setPricePerNight(1200.00)
                 .setRoomStatus(RoomStatus.AVAILABLE)
                 .build();

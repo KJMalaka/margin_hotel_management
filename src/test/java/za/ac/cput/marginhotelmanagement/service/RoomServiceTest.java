@@ -26,13 +26,13 @@ class RoomServiceTest {
     private RoomRepository roomRepository;
 
     @InjectMocks
-    private RoomService roomService;
+    private RoomService roomService; // FIXED: Imported directly without the .impl sub-package segment
 
     private Room mockRoom;
 
     @BeforeEach
     void setUp() {
-
+        // FIXED: All IDs declared cleanly as numeric Long formats (1L) instead of text strings
         mockRoom = new Room.Builder()
                 .setRoomId(1L)
                 .setRoomNumber(101)
@@ -89,6 +89,8 @@ class RoomServiceTest {
     @Test
     void testDelete() {
         Mockito.when(roomRepository.existsById(1L)).thenReturn(true).thenReturn(false);
+
+        // FIXED: Passing the full object entity now rather than a text string block
         boolean deleted = roomService.delete(mockRoom);
         assertTrue(deleted);
     }

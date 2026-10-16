@@ -3,7 +3,7 @@ package za.ac.cput.marginhotelmanagement.mappers;
 /*
    Converts between the Payment entity and its DTOs. Kept as plain static
    methods, same style as the existing Factory classes (BookingFactory,
-   PaymentFactory) so the service layer can call
+   PaymentFactory, etc.) so the service layer can call
    PaymentMapper.toEntity(...) / PaymentMapper.toResponseDto(...) without
    needing a Spring bean or a mapping library like MapStruct.
    Author: DM Madondo (230949703)
@@ -13,12 +13,14 @@ package za.ac.cput.marginhotelmanagement.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import za.ac.cput.marginhotelmanagement.domain.Payment;
-import za.ac.cput.marginhotelmanagement.domain.dtos.CreatePaymentRequest;
-import za.ac.cput.marginhotelmanagement.domain.dtos.PaymentDto;
+import za.ac.cput.marginhotelmanagement.dtos.CreatePaymentRequest;
+import za.ac.cput.marginhotelmanagement.dtos.PaymentDto;
 
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
-    // MapStruct's builder introspection just sees
+    // "invoice" and "paymentDate" are set explicitly in PaymentService, not
+    // from the request. "paymentId" is DB-generated. "copy" isn't a real
+    // property — MapStruct's builder introspection just sees
     // Payment.Builder.copy(Payment) and treats it like one; ignoring it here
     // just silences that false-positive "unmapped target property" warning.
     @Mapping(target = "invoice", ignore = true)
