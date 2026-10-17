@@ -22,5 +22,5 @@ public class BookingDto {
     private BookingChannel bookingChannel;
     private Long guestId;
     private Long roomId;
-    private int roomNumber;
+    private Integer roomNumber;
 }

@@ -45,10 +45,10 @@ public class BookingService implements IBookingService {
 
     @Override
     public Booking create(Booking booking) {
+        if (booking == null) {
+            throw new IllegalArgumentException("Booking must not be null");
+        }
         // Reject overlapping bookings for the same room before saving.
-        // Helper.isRoomAvailable (called via isRoomAvailable below) also
-        // throws IllegalArgumentException if the stay period itself is
-        // invalid (null dates, or check-out not after check-in).
         if (booking.getRoom() != null && booking.getStayPeriod() != null) {
             LocalDate checkIn = booking.getStayPeriod().getCheckInDate().toLocalDate();
             LocalDate checkOut = booking.getStayPeriod().getCheckOutDate().toLocalDate();
@@ -75,12 +75,17 @@ public class BookingService implements IBookingService {
 
     @Override
     public boolean delete(Booking booking) {
-        return false;
+        if (booking == null || booking.getBookingId() == null
+                || !bookingRepository.existsById(booking.getBookingId())) {
+            return false;
+        }
+        bookingRepository.delete(booking);
+        return true;
     }
 
     @Override
     public List<Booking> findAll() {
-        return List.of();
+        return bookingRepository.findAll();
     }
 
     @Override

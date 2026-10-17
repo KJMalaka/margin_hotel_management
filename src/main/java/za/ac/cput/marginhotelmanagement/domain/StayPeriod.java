@@ -14,7 +14,12 @@ public class StayPeriod implements ValueObject {
     private LocalDateTime checkOutDate;
 
    public StayPeriod(LocalDate localDate, LocalDate date){
-
+       if (localDate != null) {
+           this.checkInDate = localDate.atStartOfDay();
+       }
+       if (date != null) {
+           this.checkOutDate = date.atStartOfDay();
+       }
    }
     private StayPeriod(Builder builder) {
         this.checkInDate = builder.checkInDate;
