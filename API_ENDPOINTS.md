@@ -23,9 +23,12 @@ Most endpoints require a valid JWT. Log in via `/auth/login` and send the return
 | `/auth/**` | Public — no token needed |
 | `/room/**` (GET only) | Public |
 | `/room/**` (POST/PUT/DELETE) | `ADMIN` |
-| `/booking/**`, `/guest/**`, `/invoice/**` | `RECEPTIONIST` or `ADMIN` |
+| Guest lookup/create and booking create | `USER`, `RECEPTIONIST`, or `ADMIN`; `USER` is limited to their own guest email/record |
+| Invoice create/read | `USER`, `RECEPTIONIST`, or `ADMIN`; `USER` is limited to their own booking/invoice |
+| Other booking, guest, and invoice operations | `RECEPTIONIST` or `ADMIN` |
 | `/staff/**` | `ADMIN` |
-| `/payment/**` | Any authenticated user |
+| `/payment/create` and other standard payment operations | `RECEPTIONIST` or `ADMIN` |
+| `/payment/checkout` | `USER` only and only when `APP_DEMO_CHECKOUT_ENABLED=true`; creates a simulated successful payment for the user's own invoice |
 
 ## Auth API
 
@@ -52,7 +55,9 @@ Base path: `/booking`
 
 - `POST /booking/create`
   - Creates a booking. Rejects overlapping bookings for the same room.
-  - Request body: `CreateBookingRequest`
+  - Requires a JWT with role `USER`, `RECEPTIONIST`, or `ADMIN`. A `USER` can book only for a guest record whose email matches the authenticated account.
+  - Request body: `CreateBookingRequest` with `checkInDate`, `checkOutDate` (`yyyy-MM-dd'T'HH:mm:ss`), `bookingChannel`, `guestId`, and `roomId` (the numeric `roomId` returned by a room GET endpoint).
+  - Example: `{"checkInDate":"2026-10-20T14:00:00","checkOutDate":"2026-10-22T10:00:00","bookingChannel":"ONLINE","guestId":1,"roomId":1}`
   - Response: created `BookingDto`, 409 if the room is already booked for those dates, or 400 if the request is invalid
 
 - `GET /booking/read/{id}`
@@ -80,6 +85,7 @@ Base path: `/guest`
   - Creates a guest.
   - Request body: `CreateGuestRequest`
   - Response: created `GuestDto` or 400 if invalid
+  - Requires role `USER`, `RECEPTIONIST`, or `ADMIN`. A `USER` may create only a guest with the authenticated account's email and only when one does not already exist.
 
 - `GET /guest/read/{id}`
   - Reads one guest by ID.
@@ -107,6 +113,7 @@ Base path: `/guest`
 - `GET /guest/findByEmail/{email}`
   - Finds a guest by email — used to detect a returning guest.
   - Response: `GuestDto` or 404 if not found
+  - Requires role `USER`, `RECEPTIONIST`, or `ADMIN`. A `USER` can look up only their authenticated email.
 
 ## Invoice API
 
@@ -116,10 +123,12 @@ Base path: `/invoice`
   - Creates an invoice for a booking.
   - Request body: `CreateInvoiceRequest`
   - Response: created `InvoiceDto` or 400 if invalid
+  - Requires role `USER`, `RECEPTIONIST`, or `ADMIN`. A `USER` may create an invoice only for their own booking; the backend forces its initial status to `PENDING`.
 
 - `GET /invoice/read/{id}`
   - Reads one invoice by ID.
   - Response: `InvoiceDto` or 404 if not found
+  - Requires role `USER`, `RECEPTIONIST`, or `ADMIN`. A `USER` can read only their own invoice.
 
 - `PUT /invoice/update/{id}`
   - Updates an invoice's status/amount.
@@ -151,6 +160,11 @@ Base path: `/payment`
   - Records a payment against an invoice.
   - Request body: `CreatePaymentRequest`
   - Response: created `PaymentDto` or 400 if invalid
+  - Staff operation for `RECEPTIONIST` or `ADMIN`; guests cannot set payment outcomes through this endpoint.
+
+- `POST /payment/checkout`
+  - Simulates successful checkout for the authenticated user's own invoice. The backend sets the payment amount to the invoice total, sets status to `SUCCESS`, sets the payment date, and marks the invoice `PAID`.
+  - Requires role `USER` and `APP_DEMO_CHECKOUT_ENABLED=true` on the backend. The body contains only `invoiceId`, e.g. `{"invoiceId":12}`. Duplicate payments for an invoice return 409.
 
 - `GET /payment/read/{id}`
   - Reads one payment by ID.
@@ -200,9 +214,10 @@ Base path: `/room`
   - Deletes a room by ID. **Admin only.**
   - Response: 204 No Content or 404 if not found
 
-- `GET /room/all`
+- `GET /room/all`, `/room/getall`, or `/room/getAll`
   - Returns all rooms.
-  - Response: list of `Room`
+  - Response: list of rooms, each with a generated numeric `roomId` (a JSON number), `roomNumber`, `roomType`, `pricePerNight`, and `roomStatus`.
+  - The GET routes are public. For example, `GET http://localhost:8080/marginhotel/room/getall` can be used by the frontend to populate its room list and obtain valid `roomId` values.
 
 - `GET /room/status/{status}`
   - Finds rooms by status (e.g. `AVAILABLE`, `OCCUPIED`).

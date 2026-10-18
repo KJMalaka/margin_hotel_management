@@ -6,6 +6,7 @@ package za.ac.cput.marginhotelmanagement.service;
    */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.marginhotelmanagement.domain.Invoice;
 import za.ac.cput.marginhotelmanagement.domain.Payment;
 import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;
@@ -86,6 +87,24 @@ public class PaymentService implements IPaymentService {
 
         Payment savedPayment = this.paymentRepository.save(paymentToSave);
         syncInvoiceStatus(invoice, savedPayment.getPaymentStatus());
+        return savedPayment;
+    }
+
+    @Transactional
+    public Payment createCheckout(Long invoiceId) {
+        Invoice invoice = resolveInvoice(invoiceId);
+        if (paymentRepository.existsByInvoice_InvoiceId(invoiceId)) {
+            throw new IllegalStateException("A payment already exists for this invoice");
+        }
+
+        Payment payment = new Payment.Builder()
+                .setAmount(invoice.getTotalAmount())
+                .setPaymentStatus(PaymentStatus.SUCCESS)
+                .setPaymentDate(LocalDateTime.now())
+                .setInvoice(invoice)
+                .build();
+        Payment savedPayment = paymentRepository.save(payment);
+        syncInvoiceStatus(invoice, PaymentStatus.SUCCESS);
         return savedPayment;
     }
 

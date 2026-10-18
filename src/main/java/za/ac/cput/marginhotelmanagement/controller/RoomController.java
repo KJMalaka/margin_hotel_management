@@ -59,7 +59,7 @@ public class RoomController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/all")
+    @GetMapping({"/all", "/getall", "/getAll"})
     public ResponseEntity<List<Room>> getAll() {
         List<Room> rooms = roomService.findAll();
         return new ResponseEntity<>(rooms, HttpStatus.OK);

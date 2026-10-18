@@ -12,10 +12,12 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import za.ac.cput.marginhotelmanagement.domain.Room;
 import za.ac.cput.marginhotelmanagement.enums.RoomStatus;
 import za.ac.cput.marginhotelmanagement.enums.RoomType;
 import za.ac.cput.marginhotelmanagement.service.IRoomService;
+import za.ac.cput.marginhotelmanagement.service.JwtService;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +35,12 @@ class RoomControllerTest {
 
     @MockitoBean
     private IRoomService roomService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -112,7 +120,20 @@ class RoomControllerTest {
 
         mockMvc.perform(get("/room/all"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.roomNumber").value(101));
+                .andExpect(jsonPath("$[0].roomId").value(1L))
+                .andExpect(jsonPath("$[0].roomNumber").value(101));
+    }
+
+    @Test
+    void testFindAllAliases() throws Exception {
+        Mockito.when(roomService.findAll()).thenReturn(Collections.singletonList(mockRoom));
+
+        for (String path : List.of("/room/getall", "/room/getAll")) {
+            mockMvc.perform(get(path))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].roomId").value(1L))
+                    .andExpect(jsonPath("$[0].roomNumber").value(101));
+        }
     }
 
     @Test

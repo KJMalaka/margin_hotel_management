@@ -69,11 +69,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/room/**").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/room/**").hasAnyRole("ADMIN")
                         .requestMatchers("/staff/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/booking/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/guest/create").hasAnyRole("USER", "RECEPTIONIST", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/guest/findByEmail/**").hasAnyRole("USER", "RECEPTIONIST", "ADMIN")
+                        .requestMatchers("/guest/**").hasAnyRole("RECEPTIONIST", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/booking/create").hasAnyRole("USER", "RECEPTIONIST", "ADMIN")
+                        .requestMatchers("/booking/**").hasAnyRole("RECEPTIONIST", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/invoice/create").hasAnyRole("USER", "RECEPTIONIST", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/invoice/read/**").hasAnyRole("USER", "RECEPTIONIST", "ADMIN")
+                        .requestMatchers("/invoice/**").hasAnyRole("RECEPTIONIST", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/payment/checkout").hasRole("USER")
                         .requestMatchers(
-                                "/guest/**",
-                                "/invoice/**",
-                                "/payment/**").hasAnyRole("RECEPTIONIST", "ADMIN") //Payment is missing.
+                                "/payment/**").hasAnyRole("RECEPTIONIST", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationConfig, UsernamePasswordAuthenticationFilter.class)

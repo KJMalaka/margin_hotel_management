@@ -12,11 +12,13 @@ package za.ac.cput.marginhotelmanagement.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.marginhotelmanagement.domain.dtos.guest.CreateGuestRequest;
 import za.ac.cput.marginhotelmanagement.domain.dtos.guest.GuestDto;
 import za.ac.cput.marginhotelmanagement.domain.dtos.guest.UpdateGuestRequest;
 import za.ac.cput.marginhotelmanagement.service.GuestService;
+import za.ac.cput.marginhotelmanagement.service.GuestFlowAccess;
 
 import java.util.List;
 
@@ -25,14 +27,24 @@ import java.util.List;
 public class GuestController {
 
     private final GuestService guestService;
+    private final GuestFlowAccess guestFlowAccess;
 
     @Autowired
-    public GuestController(GuestService guestService) {
+    public GuestController(GuestService guestService, GuestFlowAccess guestFlowAccess) {
         this.guestService = guestService;
+        this.guestFlowAccess = guestFlowAccess;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody CreateGuestRequest request) {
+    public ResponseEntity<?> create(@RequestBody CreateGuestRequest request, Authentication authentication) {
+        if (guestFlowAccess.isGuest(authentication)) {
+            if (!guestFlowAccess.ownsEmail(request.getEmail(), authentication)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            if (guestService.getGuestByEmail(request.getEmail()) != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+        }
         try {
             GuestDto createdGuest = guestService.createGuest(request);
             return new ResponseEntity<>(createdGuest, HttpStatus.CREATED);
@@ -92,7 +104,10 @@ public class GuestController {
     }
 
     @GetMapping("/findByEmail/{email}")
-    public ResponseEntity<GuestDto> findByEmail(@PathVariable String email) {
+    public ResponseEntity<GuestDto> findByEmail(@PathVariable String email, Authentication authentication) {
+        if (guestFlowAccess.isGuest(authentication) && !guestFlowAccess.ownsEmail(email, authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         GuestDto guest = guestService.getGuestByEmail(email);
         if (guest != null) {
             return new ResponseEntity<>(guest, HttpStatus.OK);

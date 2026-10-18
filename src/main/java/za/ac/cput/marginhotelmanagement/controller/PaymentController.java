@@ -7,14 +7,18 @@ package za.ac.cput.marginhotelmanagement.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.marginhotelmanagement.domain.Payment;
 import za.ac.cput.marginhotelmanagement.domain.dtos.payment.CreatePaymentRequest;
+import za.ac.cput.marginhotelmanagement.domain.dtos.payment.CheckoutRequest;
 import za.ac.cput.marginhotelmanagement.domain.dtos.payment.PaymentDto;
 import za.ac.cput.marginhotelmanagement.domain.dtos.payment.UpdatePaymentRequest;
 import za.ac.cput.marginhotelmanagement.enums.PaymentStatus;
 import za.ac.cput.marginhotelmanagement.mappers.PaymentMapper;
 import za.ac.cput.marginhotelmanagement.service.PaymentService;
+import za.ac.cput.marginhotelmanagement.service.GuestFlowAccess;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,11 +28,19 @@ import java.util.List;
 public class PaymentController {
     private final PaymentService paymentService;
     private final PaymentMapper paymentMapper;
+    private final GuestFlowAccess guestFlowAccess;
+    private final boolean demoCheckoutEnabled;
 
     @Autowired
-    public PaymentController(PaymentService paymentService, PaymentMapper paymentMapper) {
+    public PaymentController(
+            PaymentService paymentService,
+            PaymentMapper paymentMapper,
+            GuestFlowAccess guestFlowAccess,
+            @Value("${app.checkout.demo-enabled:false}") boolean demoCheckoutEnabled) {
         this.paymentService = paymentService;
         this.paymentMapper = paymentMapper;
+        this.guestFlowAccess = guestFlowAccess;
+        this.demoCheckoutEnabled = demoCheckoutEnabled;
     }
 
     @PostMapping("/create")
@@ -39,6 +51,26 @@ public class PaymentController {
             return new ResponseEntity<>(paymentMapper.toDto(created), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> checkout(
+            @RequestBody CheckoutRequest request,
+            Authentication authentication) {
+        if (!demoCheckoutEnabled) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (!guestFlowAccess.ownsInvoice(request.getInvoiceId(), authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        try {
+            Payment created = paymentService.createCheckout(request.getInvoiceId());
+            return new ResponseEntity<>(paymentMapper.toDto(created), HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 

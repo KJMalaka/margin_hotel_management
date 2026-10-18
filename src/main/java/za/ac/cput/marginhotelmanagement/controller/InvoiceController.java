@@ -9,12 +9,14 @@ package za.ac.cput.marginhotelmanagement.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.marginhotelmanagement.domain.dtos.invoice.CreateInvoiceRequest;
 import za.ac.cput.marginhotelmanagement.domain.dtos.invoice.InvoiceDto;
 import za.ac.cput.marginhotelmanagement.domain.dtos.invoice.UpdateInvoiceRequest;
 import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;
 import za.ac.cput.marginhotelmanagement.service.InvoiceService;
+import za.ac.cput.marginhotelmanagement.service.GuestFlowAccess;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,14 +27,22 @@ import java.util.List;
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
+    private final GuestFlowAccess guestFlowAccess;
 
     @Autowired
-    public InvoiceController(InvoiceService invoiceService) {
+    public InvoiceController(InvoiceService invoiceService, GuestFlowAccess guestFlowAccess) {
         this.invoiceService = invoiceService;
+        this.guestFlowAccess = guestFlowAccess;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody CreateInvoiceRequest request) {
+    public ResponseEntity<?> create(@RequestBody CreateInvoiceRequest request, Authentication authentication) {
+        if (guestFlowAccess.isGuest(authentication)) {
+            if (!guestFlowAccess.ownsBooking(request.getBookingId(), authentication)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            request.setStatus(InvoiceStatus.PENDING);
+        }
         try {
             InvoiceDto created = invoiceService.createInvoice(request);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -42,7 +52,10 @@ public class InvoiceController {
     }
 
     @GetMapping("/read/{id}")
-    public ResponseEntity<InvoiceDto> read(@PathVariable Long id) {
+    public ResponseEntity<InvoiceDto> read(@PathVariable Long id, Authentication authentication) {
+        if (guestFlowAccess.isGuest(authentication) && !guestFlowAccess.ownsInvoice(id, authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         InvoiceDto invoiceDto = invoiceService.readInvoice(id);
         if (invoiceDto == null) {
             return ResponseEntity.notFound().build();

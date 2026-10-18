@@ -3,11 +3,13 @@ package za.ac.cput.marginhotelmanagement.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.marginhotelmanagement.domain.dtos.booking.BookingDto;
 import za.ac.cput.marginhotelmanagement.domain.dtos.booking.CreateBookingRequest;
 import za.ac.cput.marginhotelmanagement.domain.dtos.booking.UpdateBookingRequest;
 import za.ac.cput.marginhotelmanagement.service.BookingService;
+import za.ac.cput.marginhotelmanagement.service.GuestFlowAccess;
 
 import java.util.List;
 
@@ -16,14 +18,20 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final GuestFlowAccess guestFlowAccess;
 
     @Autowired
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, GuestFlowAccess guestFlowAccess) {
         this.bookingService = bookingService;
+        this.guestFlowAccess = guestFlowAccess;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody CreateBookingRequest request) {
+    public ResponseEntity<?> create(@RequestBody CreateBookingRequest request, Authentication authentication) {
+        if (guestFlowAccess.isGuest(authentication)
+                && !guestFlowAccess.ownsGuest(request.getGuestId(), authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             BookingDto createdBooking = bookingService.createBooking(request);
             return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
