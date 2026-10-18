@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.domain.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos.invoice;
 
 import lombok.Data;
 import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;

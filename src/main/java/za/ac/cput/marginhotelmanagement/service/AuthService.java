@@ -6,10 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 import za.ac.cput.marginhotelmanagement.domain.*;
-import za.ac.cput.marginhotelmanagement.domain.dtos.AuthUserResponse;
-import za.ac.cput.marginhotelmanagement.domain.dtos.CheckUserEmailResponse;
-import za.ac.cput.marginhotelmanagement.domain.dtos.LoginUserRequest;
-import za.ac.cput.marginhotelmanagement.domain.dtos.RegisterUserRequest;
 import za.ac.cput.marginhotelmanagement.enums.UserRole;
 import za.ac.cput.marginhotelmanagement.repository.*;
 import za.ac.cput.marginhotelmanagement.util.Helper;
@@ -25,7 +21,6 @@ public class AuthService {
     private final GuestRepository guestRepository;
     private final BookingRepository bookingRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public AuthService(
@@ -33,56 +28,50 @@ public class AuthService {
             GuestRepository guestRepository,
             BookingRepository bookingRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService,
             AuthenticationManager authenticationManager
     ){
         this.appUserRepository = appUserRepository;
         this.guestRepository = guestRepository;
         this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
     }
 
     /*Check exisiting email*/
-    public CheckUserEmailResponse checkUserEmail(String email) {
+    public GuestEmailStatus checkUserEmail(String email) {
         Guest latestGuest = findLatestGuestByEmail(email);
         if(latestGuest == null){
-            return new CheckUserEmailResponse(false, null);
+            return new GuestEmailStatus(false, null);
         }
-        return new CheckUserEmailResponse(true, latestBookingDate(latestGuest));
+        return new GuestEmailStatus(true, latestBookingDate(latestGuest));
     }
 
     /*Register */
-    public AuthUserResponse registerUser(RegisterUserRequest registerUserRequest) {
-        validate(registerUserRequest);
+    public AppUser registerUser(String email, String firstName, String lastName, String mobile, String password) {
+        validate(email, firstName, lastName, mobile, password);
 
-        if (appUserRepository.findByEmail(registerUserRequest.getEmail()).isPresent()) {
+        if (appUserRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("An account with this email already exists");
         }
 
-        Guest guest = resolveGuest(registerUserRequest);
-        String hashedPassword = passwordEncoder.encode(registerUserRequest.getPassword());
+        Guest guest = resolveGuest(email, firstName, lastName, mobile);
+        String hashedPassword = passwordEncoder.encode(password);
 
         AppUser appUser = new AppUser.Builder()
-                .setEmail(registerUserRequest.getEmail())
+                .setEmail(email)
                 .setPassword(hashedPassword)
                 .setRole(UserRole.USER) //Always USER on public facing registration
                 .setGuest(guest)
                 .build();
 
-        AppUser savedAppUser = appUserRepository.save(appUser);
-        String token = jwtService.generateToken(savedAppUser.getEmail());
-        return new AuthUserResponse(token, savedAppUser.getEmail(), savedAppUser.getRole());
+        return appUserRepository.save(appUser);
     }
 
     /*Login App User, AuthController checks for email and password mismatch*/
-    public AuthUserResponse loginUser(LoginUserRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        AppUser appUser = appUserRepository.findByEmail(request.getEmail())
+    public AppUser loginUser(String email, String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        return appUserRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-        String token = jwtService.generateToken(appUser.getEmail());
-        return new AuthUserResponse(token, appUser.getEmail(), appUser.getRole());
     }
 
     /*Private Helpers*/
@@ -108,16 +97,16 @@ public class AuthService {
     }
 
     //Recreate Guest information, if guest exists, update the name and contact details, else create a new guest
-    private Guest resolveGuest(RegisterUserRequest request) {
-        Guest exists = findLatestGuestByEmail(request.getEmail());
+    private Guest resolveGuest(String email, String firstName, String lastName, String mobile) {
+        Guest exists = findLatestGuestByEmail(email);
 
         Name name = new Name.Builder()
-                .setFirstName(request.getFirstName())
-                .setLastName(request.getLastName())
+                .setFirstName(firstName)
+                .setLastName(lastName)
                 .build();
         ContactDetails contactDetails = new ContactDetails.Builder()
-                .setEmail(request.getEmail())
-                .setMobile(request.getMobile())
+                .setEmail(email)
+                .setMobile(mobile)
                 .build();
         if (exists != null) {
             Guest update = new Guest.Builder()
@@ -135,17 +124,17 @@ public class AuthService {
     }
 
     //Validate user input
-    private void validate(RegisterUserRequest request){
-        if(Helper.isInvalidEmail(request.getEmail())){
+    private void validate(String email, String firstName, String lastName, String mobile, String password) {
+        if(Helper.isInvalidEmail(email)){
             throw new IllegalArgumentException("Invalid email address");
         }
-        if (Helper.isNullOrEmpty(request.getFirstName()) || Helper.isNullOrEmpty(request.getLastName())) {
+        if (Helper.isNullOrEmpty(firstName) || Helper.isNullOrEmpty(lastName)) {
             throw new IllegalArgumentException("First name and last name are required");
         }
-        if (Helper.isInvalidMobile(request.getMobile())) {
+        if (Helper.isInvalidMobile(mobile)) {
             throw new IllegalArgumentException("Mobile number must be exactly 10 digits");
         }
-        if (Helper.isInvalidPassword(request.getPassword())) {
+        if (Helper.isInvalidPassword(password)) {
             throw new IllegalArgumentException("Password must be at least 8 characters");
         }
     }

@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.domain.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos.guest;
 /*
    Author: Hlomla Magopeni (218070349)
    Date: 09 September 2026

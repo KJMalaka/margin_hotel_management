@@ -67,11 +67,7 @@ public class RoomService implements IRoomService {
         if (checkInDate == null || checkOutDate == null || !checkInDate.isBefore(checkOutDate)) {
             return List.of();
         }
-        return false;
-    }
-
-    @Override
-    public List<Room> getRoomByStatus(RoomStatus status) {
-        return roomRepository.findByRoomStatus(status);
+        List<Room> availableRooms = roomRepository.findAvailableRooms(checkInDate.atStartOfDay(), checkOutDate.atStartOfDay());
+        return availableRooms != null ? availableRooms : List.of();
     }
 }

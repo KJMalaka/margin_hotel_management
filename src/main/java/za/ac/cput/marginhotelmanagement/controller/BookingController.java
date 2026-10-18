@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.marginhotelmanagement.domain.dtos.BookingDto;
-import za.ac.cput.marginhotelmanagement.domain.dtos.CreateBookingRequest;
-import za.ac.cput.marginhotelmanagement.domain.dtos.UpdateBookingRequest;
+import za.ac.cput.marginhotelmanagement.domain.dtos.booking.BookingDto;
+import za.ac.cput.marginhotelmanagement.domain.dtos.booking.CreateBookingRequest;
+import za.ac.cput.marginhotelmanagement.domain.dtos.booking.UpdateBookingRequest;
 import za.ac.cput.marginhotelmanagement.service.BookingService;
 
 import java.util.List;

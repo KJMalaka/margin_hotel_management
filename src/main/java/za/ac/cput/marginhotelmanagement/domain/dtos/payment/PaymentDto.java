@@ -1,8 +1,5 @@
-package za.ac.cput.marginhotelmanagement.domain.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos.payment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import za.ac.cput.marginhotelmanagement.enums.PaymentStatus;

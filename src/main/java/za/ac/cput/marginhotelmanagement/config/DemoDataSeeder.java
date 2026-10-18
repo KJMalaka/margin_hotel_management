@@ -79,6 +79,7 @@ public class DemoDataSeeder implements CommandLineRunner {
         // Logins (the admin login is created by AdminSeeder)
         appUser("receptionist@marginhotel.com", "receptionist123", UserRole.RECEPTIONIST, null);
         appUser("siphomokoena@gmail.com", "guest123", UserRole.USER, sipho);
+        appUser("nomsa.khumalo@marginhotel.co.za", "manager123", UserRole.ADMIN, null);
 
         // Bookings, invoices and payments (offsets are days from today)
         // Three completed stays, all paid

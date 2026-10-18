@@ -1,11 +1,8 @@
 package za.ac.cput.marginhotelmanagement.mappers;
 
 /*
-   Converts between the Payment entity and its DTOs. Kept as plain static
-   methods, same style as the existing Factory classes (BookingFactory,
-   PaymentFactory, etc.) so the service layer can call
-   PaymentMapper.toEntity(...) / PaymentMapper.toResponseDto(...) without
-   needing a Spring bean or a mapping library like MapStruct.
+   Converts between the Payment entity and its DTOs using a Spring-managed
+   MapStruct mapper.
    Author: DM Madondo (230949703)
    Date: 24 August 2026
    */
@@ -13,8 +10,8 @@ package za.ac.cput.marginhotelmanagement.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import za.ac.cput.marginhotelmanagement.domain.Payment;
-import za.ac.cput.marginhotelmanagement.dtos.CreatePaymentRequest;
-import za.ac.cput.marginhotelmanagement.dtos.PaymentDto;
+import za.ac.cput.marginhotelmanagement.domain.dtos.payment.CreatePaymentRequest;
+import za.ac.cput.marginhotelmanagement.domain.dtos.payment.PaymentDto;
 
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {

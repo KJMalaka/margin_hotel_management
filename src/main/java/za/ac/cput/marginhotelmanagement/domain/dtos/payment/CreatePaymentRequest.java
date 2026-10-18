@@ -1,9 +1,7 @@
-package za.ac.cput.marginhotelmanagement.domain.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos.payment;
 
 import lombok.Data;
 import za.ac.cput.marginhotelmanagement.enums.PaymentStatus;
-
-import java.time.LocalDateTime;
 
 /*
    Author: DM Madondo (230949703)

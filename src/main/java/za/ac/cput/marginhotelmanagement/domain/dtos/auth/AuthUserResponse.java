@@ -1,4 +1,4 @@
-package za.ac.cput.marginhotelmanagement.domain.dtos;
+package za.ac.cput.marginhotelmanagement.domain.dtos.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

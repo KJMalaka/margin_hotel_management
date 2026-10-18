@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.marginhotelmanagement.domain.dtos.CreatePaymentRequest;
-import za.ac.cput.marginhotelmanagement.domain.dtos.PaymentDto;
-import za.ac.cput.marginhotelmanagement.domain.dtos.UpdatePaymentRequest;
+import za.ac.cput.marginhotelmanagement.domain.Payment;
+import za.ac.cput.marginhotelmanagement.domain.dtos.payment.CreatePaymentRequest;
+import za.ac.cput.marginhotelmanagement.domain.dtos.payment.PaymentDto;
+import za.ac.cput.marginhotelmanagement.domain.dtos.payment.UpdatePaymentRequest;
 import za.ac.cput.marginhotelmanagement.enums.PaymentStatus;
+import za.ac.cput.marginhotelmanagement.mappers.PaymentMapper;
 import za.ac.cput.marginhotelmanagement.service.PaymentService;
 
 import java.time.LocalDateTime;
@@ -21,17 +23,20 @@ import java.util.List;
 @RequestMapping("/payment")
 public class PaymentController {
     private final PaymentService paymentService;
+    private final PaymentMapper paymentMapper;
 
     @Autowired
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, PaymentMapper paymentMapper) {
         this.paymentService = paymentService;
+        this.paymentMapper = paymentMapper;
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody CreatePaymentRequest request) {
         try {
-            PaymentDto created = paymentService.createPayment(request);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
+            Payment payment = paymentMapper.toEntity(request);
+            Payment created = paymentService.createPayment(payment, request.getInvoiceId());
+            return new ResponseEntity<>(paymentMapper.toDto(created), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -39,22 +44,22 @@ public class PaymentController {
 
     @GetMapping("/read/{id}")
     public ResponseEntity<PaymentDto> read(@PathVariable Long id) {
-        PaymentDto paymentDto = paymentService.readPayment(id);
-        if (paymentDto == null) {
+        Payment payment = paymentService.read(id);
+        if (payment == null) {
             return ResponseEntity.notFound().build();
         } else {
-            return ResponseEntity.ok(paymentDto);
+            return ResponseEntity.ok(paymentMapper.toDto(payment));
         }
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UpdatePaymentRequest request) {
         try {
-            PaymentDto updated = paymentService.updatePayment(id, request);
+            Payment updated = paymentService.updatePayment(id, request.getPaymentStatus());
             if (updated == null) {
                 return new ResponseEntity<>("No payment found with ID #" + id, HttpStatus.NOT_FOUND);
             }
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(paymentMapper.toDto(updated));
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -62,21 +67,22 @@ public class PaymentController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean deleted = paymentService.deletePayment(id);
-        if (!deleted) {
+        Payment payment = paymentService.read(id);
+        if (payment == null) {
             return ResponseEntity.notFound().build();
         }
+        paymentService.delete(payment);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/getall")
     public ResponseEntity<List<PaymentDto>> getAll() {
-        return ResponseEntity.ok(paymentService.getAllPayments());
+        return ResponseEntity.ok(paymentService.findAll().stream().map(paymentMapper::toDto).toList());
     }
 
     @GetMapping("/findByAmount/{amount}")
     public ResponseEntity<List<PaymentDto>> findByAmount(@PathVariable double amount) {
-        return ResponseEntity.ok(paymentService.getPaymentsByAmount(amount));
+        return ResponseEntity.ok(paymentService.findPaymentByAmount(amount).stream().map(paymentMapper::toDto).toList());
     }
 
     @GetMapping("/findPaymentByPaymentStatus/{paymentStatus}")
@@ -87,11 +93,19 @@ public class PaymentController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>("Invalid payment status'" + paymentStatus + "' expected (SUCCESS or FAILED", HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(paymentService.getPaymentsByPaymentStatus(status));
+        List<PaymentDto> payments = paymentService.findPaymentByPaymentStatus(status)
+                .stream()
+                .map(paymentMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(payments);
     }
 
     @GetMapping("/findPaymentByPaymentDateBetween/{startDate}/{endDate}")
     public ResponseEntity<List<PaymentDto>> findPaymentByPaymentDateBetween(@PathVariable LocalDateTime startDate, @PathVariable LocalDateTime endDate) {
-        return ResponseEntity.ok(paymentService.getPaymentsByPaymentDateBetween(startDate, endDate));
+        List<PaymentDto> payments = paymentService.findPaymentByPaymentDateBetween(startDate, endDate)
+                .stream()
+                .map(paymentMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(payments);
     }
 }

@@ -8,12 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.marginhotelmanagement.domain.Invoice;
 import za.ac.cput.marginhotelmanagement.domain.Payment;
-import za.ac.cput.marginhotelmanagement.dtos.CreatePaymentRequest;
-import za.ac.cput.marginhotelmanagement.dtos.PaymentDto;
-import za.ac.cput.marginhotelmanagement.dtos.UpdatePaymentRequest;
 import za.ac.cput.marginhotelmanagement.enums.InvoiceStatus;
 import za.ac.cput.marginhotelmanagement.enums.PaymentStatus;
-import za.ac.cput.marginhotelmanagement.mappers.PaymentMapper;
 import za.ac.cput.marginhotelmanagement.repository.PaymentRepository;
 import za.ac.cput.marginhotelmanagement.util.Helper;
 
@@ -25,15 +21,12 @@ import java.util.List;
 public class PaymentService implements IPaymentService {
     private final PaymentRepository paymentRepository;
     private final InvoiceService invoiceService;
-    private final PaymentMapper paymentMapper; //MapStruct generated bean
 
     @Autowired
     PaymentService(PaymentRepository paymentRepository,
-                   InvoiceService invoiceService,
-                   PaymentMapper paymentMapper) {
+                   InvoiceService invoiceService) {
         this.paymentRepository = paymentRepository;
         this.invoiceService = invoiceService;
-        this.paymentMapper = paymentMapper;
     }
 
     @Override
@@ -82,94 +75,46 @@ public class PaymentService implements IPaymentService {
         return this.paymentRepository.findPaymentByPaymentId(paymentId);
     }
 
-    //==== DTO base methods, this is what PaymentController actually calls ====//
-
-    public PaymentDto createPayment(CreatePaymentRequest request) {
-        validate(request);
-        Invoice invoice = resolveInvoice(request.getInvoiceId());
-        Payment mapped = paymentMapper.toEntity(request);
-        Payment payment = new Payment.Builder()
-                .copy(mapped)
+    public Payment createPayment(Payment payment, Long invoiceId) {
+        validate(payment);
+        Invoice invoice = resolveInvoice(invoiceId);
+        Payment paymentToSave = new Payment.Builder()
+                .copy(payment)
                 .setInvoice(invoice)
                 .setPaymentDate(LocalDateTime.now())
                 .build();
 
-        Payment savedPayment = this.paymentRepository.save(payment);
+        Payment savedPayment = this.paymentRepository.save(paymentToSave);
         syncInvoiceStatus(invoice, savedPayment.getPaymentStatus());
-        return paymentMapper.toDto(savedPayment);
+        return savedPayment;
     }
 
-    public PaymentDto readPayment(Long id) {
+    public Payment updatePayment(Long id, PaymentStatus newStatus) {
         Payment payment = this.paymentRepository.findById(id).orElse(null);
         if (payment == null) {
             return null;
         }
-        return paymentMapper.toDto(payment);
-    }
-
-    public PaymentDto updatePayment(Long id, UpdatePaymentRequest request) {
-        Payment payment = this.paymentRepository.findById(id).orElse(null);
-        if (payment == null) {
-            return null; //Controller returns 404 Not Found
-        }
-        // Update the payment object with the values from the request
-        if (Helper.isNullOrEmpty(request.getPaymentStatus())) {
+        if (Helper.isNullOrEmpty(newStatus)) {
             throw new IllegalArgumentException("Payment status is required!");
         }
-        //Only the status changes
-        PaymentStatus newStatus = PaymentStatus.valueOf(request.getPaymentStatus());
         Payment updatedPayment = new Payment.Builder()
                 .copy(payment)
                 .setPaymentStatus(newStatus)
                 .build();
         Payment savedPayment = this.paymentRepository.save(updatedPayment);
         syncInvoiceStatus(savedPayment.getInvoice(), newStatus);
-        return paymentMapper.toDto(savedPayment);
-    }
-
-    public boolean deletePayment(Long id) {
-        Payment payment = this.paymentRepository.findById(id).orElse(null);
-        if (payment == null) {
-            return false;
-        }
-        this.paymentRepository.delete(payment);
-        return true;
-    }
-
-    public List<PaymentDto> getAllPayments() {
-        return this.paymentRepository.findAll()
-                .stream()
-                .map(paymentMapper::toDto)
-                .toList();
-    }
-
-    public List<PaymentDto> getPaymentsByAmount(double amount) {
-        return this.paymentRepository.findPaymentByAmount(amount)
-                .stream()
-                .map(paymentMapper::toDto)
-                .toList();
-    }
-
-    public List<PaymentDto> getPaymentsByPaymentStatus(PaymentStatus paymentStatus) {
-        return this.paymentRepository.findPaymentByPaymentStatus(paymentStatus)
-                .stream()
-                .map(paymentMapper::toDto)
-                .toList();
-    }
-
-    public List<PaymentDto> getPaymentsByPaymentDateBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        return  this.paymentRepository.findPaymentByPaymentDateBetween(startDate, endDate)
-                .stream()
-                .map(paymentMapper::toDto)
-                .toList();
+        return savedPayment;
     }
 
     //------ Private Payment helpers ----------//
-    private void validate(CreatePaymentRequest request) {
-        if (!Helper.isValidAmount(request.getAmount())) {
+    private void validate(Payment payment) {
+        if (Helper.isNullOrEmpty(payment)) {
+            throw new IllegalArgumentException("Payment is required");
+        }
+        if (!Helper.isValidAmount(payment.getAmount())) {
             throw new IllegalArgumentException("Amount must be greater than R0");
         }
-        if (Helper.isNullOrEmpty(request.getPaymentStatus())) {
+        if (Helper.isNullOrEmpty(payment.getPaymentStatus())) {
             throw new IllegalArgumentException("Payment status is required!");
         }
     }
