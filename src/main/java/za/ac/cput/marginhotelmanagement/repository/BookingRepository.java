@@ -40,6 +40,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         @Param("checkInDate") LocalDateTime checkInDate,
                         @Param("checkOutDate") LocalDateTime checkOutDate);
 
-        // Simple finder by room id
+        // Simple finder by room id — underscore needed because Room's id
+        // field is called "roomId", not "id" (same reason findByGuest_GuestId
+        // above needs one). Without it, Spring Data tries to resolve a
+        // property literally named "id" on Room and fails at boot.
         List<Booking> findByRoom_RoomId(Long roomId);
 }

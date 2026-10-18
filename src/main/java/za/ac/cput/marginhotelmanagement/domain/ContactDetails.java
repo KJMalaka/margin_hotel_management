@@ -1,22 +1,20 @@
 package za.ac.cput.marginhotelmanagement.domain;
 
+import jakarta.persistence.Embeddable;
+import lombok.Getter;
+
+@Getter
+@Embeddable
 public class ContactDetails implements ValueObject {
     private String email;
     private String mobile;
 
-    private ContactDetails() {
+    public ContactDetails() {
     }
 
     public ContactDetails(Builder builder) {
         this.email = builder.email;
         this.mobile = builder.mobile;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public String getMobile() {
-        return mobile;
     }
 
     @Override

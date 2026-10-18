@@ -41,11 +41,10 @@ class RoomControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Correctly instantiate Room via its Builder pattern to fix the protected constructor error
         mockRoom = new Room.Builder()
                 .setRoomId(1L)
-                .setRoomNumber(101) // Uses integer as expected by RoomFactory
-                .setRoomType(RoomType.SINGLE) // Ensure RoomType enum value is set
+                .setRoomNumber(101)
+                .setRoomType(RoomType.SINGLE)
                 .setPricePerNight(850.00)
                 .setRoomStatus(RoomStatus.AVAILABLE)
                 .build();
@@ -56,9 +55,18 @@ class RoomControllerTest {
     void testCreate() throws Exception {
         Mockito.when(roomService.create(any(Room.class))).thenReturn(mockRoom);
 
+        String roomJson = """
+                {
+                    "roomNumber": 101,
+                    "roomType": "SINGLE",
+                    "pricePerNight": 850.00,
+                    "roomStatus": "AVAILABLE"
+                }
+                """;
+
         mockMvc.perform(post("/room/create")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockRoom)))
+                        .content(roomJson))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.roomId").value(1L))
                 .andExpect(jsonPath("$.roomNumber").value(101));
@@ -80,9 +88,19 @@ class RoomControllerTest {
     void testUpdate() throws Exception {
         Mockito.when(roomService.update(any(Room.class))).thenReturn(mockRoom);
 
+        String roomJson = """
+                {
+                    "roomId": 1,
+                    "roomNumber": 101,
+                    "roomType": "SINGLE",
+                    "pricePerNight": 850.00,
+                    "roomStatus": "AVAILABLE"
+                }
+                """;
+
         mockMvc.perform(put("/room/update")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mockRoom)))
+                        .content(roomJson))
                 .andExpect(status().isOk());
     }
 
@@ -94,7 +112,7 @@ class RoomControllerTest {
 
         mockMvc.perform(get("/room/all"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].roomNumber").value(101));
+                .andExpect(jsonPath("$.roomNumber").value(101));
     }
 
     @Test
@@ -105,14 +123,14 @@ class RoomControllerTest {
 
         mockMvc.perform(get("/room/status/AVAILABLE"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].roomStatus").value("AVAILABLE"));
+                .andExpect(jsonPath("$.roomStatus").value("AVAILABLE"));
     }
 
     @Test
     @Order(6)
     void testDelete() throws Exception {
         Mockito.when(roomService.read(1L)).thenReturn(mockRoom);
-        Mockito.when(roomService.delete(any(Room.class))).thenReturn(true);
+        Mockito.when(roomService.deleteById(1L)).thenReturn(true);
 
         mockMvc.perform(delete("/room/delete/1"))
                 .andExpect(status().isNoContent());

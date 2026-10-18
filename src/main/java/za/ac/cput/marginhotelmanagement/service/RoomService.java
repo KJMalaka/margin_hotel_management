@@ -61,13 +61,17 @@ public class RoomService implements IRoomService {
         return roomRepository.findByRoomStatus(status);
     }
 
+    //Called from BookingController.create() — that's the separate double-booking
     @Override
     public List<Room> findAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate) {
         if (checkInDate == null || checkOutDate == null || !checkInDate.isBefore(checkOutDate)) {
             return List.of();
         }
-        return roomRepository.findAvailableRooms(
-                checkInDate.atStartOfDay(),
-                checkOutDate.atTime(23, 59, 59, 999_999_999));
+        return false;
+    }
+
+    @Override
+    public List<Room> getRoomByStatus(RoomStatus status) {
+        return roomRepository.findByRoomStatus(status);
     }
 }

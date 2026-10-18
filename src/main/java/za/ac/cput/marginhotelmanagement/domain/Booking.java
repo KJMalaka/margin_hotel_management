@@ -5,9 +5,11 @@ package za.ac.cput.marginhotelmanagement.domain;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import za.ac.cput.marginhotelmanagement.enums.BookingChannel;
 
 import java.time.LocalDate;
+@Getter
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -44,31 +46,6 @@ public class Booking {
         this.room = builder.room;
     }
 
-    public Long getBookingId() {
-        return bookingId;
-    }
-
-    public LocalDate getBookingDate() {
-        return bookingDate;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public Guest getGuest() {
-        return guest;
-    }
-
-
-
-    public BookingChannel getBookingChannel() {
-        return bookingChannel;
-    }
-
-    public StayPeriod getStayPeriod() {
-        return stayPeriod;
-    }
 
     @Override
     public String toString() {

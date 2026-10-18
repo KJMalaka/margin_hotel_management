@@ -13,7 +13,7 @@ import za.ac.cput.marginhotelmanagement.domain.ContactDetails;
 import za.ac.cput.marginhotelmanagement.domain.Manager;
 import za.ac.cput.marginhotelmanagement.domain.Name;
 import za.ac.cput.marginhotelmanagement.domain.Receptionist;
-import za.ac.cput.marginhotelmanagement.domain.dtos.*;
+import za.ac.cput.marginhotelmanagement.dtos.*;
 
 public class StaffMapper {
 
