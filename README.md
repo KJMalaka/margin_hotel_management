@@ -58,3 +58,7 @@ Run the test suite from the repository root:
 - `src/main/java` — application, domain, controller, repository, and service code
 - `src/main/resources` — application configuration and web resources
 - `src/test/java` — automated tests
+
+## UML Diagram
+![Margin Hotel UML Diagram](Margin_Hotel_UML_2.jpeg)
+
